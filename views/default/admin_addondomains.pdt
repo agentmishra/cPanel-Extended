@@ -1,0 +1,112 @@
+<?php
+//  CyanDark Incorporated
+//  Copyright (c) 2012-2016 CyanDark, Inc. All Rights Reserved.
+//
+//  This software is furnished under a license and may be used and copied
+//  only  in  accordance  with  the  terms  of such  license and with the
+//  inclusion of the above copyright notice.  This software  or any other
+//  copies thereof may not be provided or otherwise made available to any
+//  other person.  No title to and  ownership of the  software is  hereby
+//  transferred.
+//
+//  You may not reverse  engineer, decompile, defeat  license  encryption
+//  mechanisms, or  disassemble this software product or software product
+//  license. CyanDark may terminate this license if you don't comply with
+//  any of the  terms  and conditions  set  forth in our end user license
+//  agreement (EULA).  In such event, licensee  agrees to return licensor
+//  or  destroy all copies  of  software  upon termination of the license
+?>
+<div class="title_row first">
+	<h3><?php $this->_('Cpe.titles.addondomains'); ?></h3>
+</div>
+<div class="pad">
+	<div class="errorscontainer marbot10 martop10"></div>
+	<?php $this->Form->create($this->uri.'create', array('id' => 'createAddonDomain')); ?>
+		<ul>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.domain', true), 'newdomain');
+				$this->Form->fieldText('newdomain', $this->Html->ifSet($this->post['newdomain']), array('id' => 'addondomainname', 'class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.domainuser', true), 'domainusername');
+				$this->Form->fieldText('domainusername', $this->Html->ifSet($this->post['username']), array('id' => 'addondomainuser', 'class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.docroot', true), 'directory'); ?>
+				<code>/home/<?php $this->Html->_($this->username); ?>/</code>
+				<?php
+				$this->Form->fieldText('directory', $this->Html->ifSet($this->post['directory']), array('id' => 'addondomainroot', 'class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php $this->Form->label($this->_('Cpe.label.password', true), 'domainpassword');?>
+				<button type="button" class="generatePassword" data-field1="domainpassword" data-field2="domainpasswordconfirm"><i class="fa fa-lock"></i> <?php $this->_('Cpe.button.generatepassword'); ?></button>
+				<?php $this->Form->fieldPassword('domainpassword', array('style' => 'float: left;', 'id' => 'domainpassword', 'class' => "form-control"));?>
+				<div id="generatedPassword" style="display: none;"><?php $this->_('Cpe.misc.genpasswordtext'); ?> <strong></strong></div>
+				<div class="clearfix"></div>
+			</li>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.passwordconfirm', true), 'domainpasswordconfirm');
+				$this->Form->fieldPassword('domainpasswordconfirm', array('id' => 'domainpasswordconfirm', 'class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php $this->_('Cpe.misc.addonhint'); ?>
+			</li>
+		</ul>
+		<div class="button_row">
+			<a class="btn_right submit cpExtendedSubmit" href="#"><?php $this->_('Cpe.button.createaddondomain'); ?></a>
+		</div>
+	<?php $this->Form->end(); ?>
+</div>
+
+<div class="title_row">
+	<h3><?php $this->_('Cpe.titles.addondomains'); ?></h3>
+</div>
+<div class="pad">
+	<table class="table">
+		<thead>
+			<tr class="heading_row">
+				<td><span><?php $this->_("Cpe.th.domain");?></span></td>
+				<td><span><?php $this->_("Cpe.th.username");?></span></td>
+				<td><span><?php $this->_("Cpe.th.docroot");?></span></td>
+				<td><span><?php $this->_("Cpe.th.redirection");?></span></td>
+				<td><span><?php $this->_("Cpe.th.actions");?></span></td>
+			</tr>
+		</thead>
+		<tbody>
+		<?php $i = 1; ?>
+		<?php foreach($this->domains->cpanelresult->data as $i => $domain){ ?>
+			<tr <?php if($i % 2 == 0){ ?>class="odd_row"<?php } ?>>
+				<td style="width: 150px; word-break: break-word;"><?php $this->Html->_($domain->domain); ?></td>
+				<td style="width: 150px; word-break: break-word;"><?php $this->Html->_($domain->subdomain); ?></td>
+				<td style="width: 270px; word-break: break-word;"><?php $this->Html->_($domain->dir); ?></td>
+				<td><?php $this->Html->_($domain->status); ?></td>
+				<td>
+					<div class="btn-group">
+						<a href="<?php echo $this->Html->safe($this->uri.'redirect/?domain='.$domain->domain.'&subdomain='.$domain->subdomain); ?>" class="btn btn-default btn-sm cpanelExtendedAjaxRequest"><?php $this->_('Cpe.button.redirect'); ?></a>
+						<button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">
+							<span class="caret"></span>
+							<span class="sr-only"><?php $this->_("AppController.sreader.dropdown");?></span>
+						</button>
+						<ul class="dropdown-menu" role="menu">
+							<li><a href="<?php echo $this->Html->safe($this->uri.'delete/?domain='.$domain->domain.'&subdomain='.$domain->subdomain); ?>" class="cpanelExtendedAjaxRequest"><i class="fa fa-ban"></i> <?php $this->_('Cpe.button.delete'); ?></a></li>
+						</ul>
+					</div>
+				</td>
+			</tr>
+			<tr class="expand_details modifyData" style="display: none;">
+				<td class="subtable" colspan="5"></td>
+			</tr>
+			<?php $i++; ?>
+		<?php } ?>
+		</tbody>
+	</table>
+</pad>
+<?php echo $this->jsScripts; ?>

@@ -1,0 +1,85 @@
+<?php
+//  CyanDark Incorporated
+//  Copyright (c) 2012-2016 CyanDark, Inc. All Rights Reserved.
+//
+//  This software is furnished under a license and may be used and copied
+//  only  in  accordance  with  the  terms  of such  license and with the
+//  inclusion of the above copyright notice.  This software  or any other
+//  copies thereof may not be provided or otherwise made available to any
+//  other person.  No title to and  ownership of the  software is  hereby
+//  transferred.
+//
+//  You may not reverse  engineer, decompile, defeat  license  encryption
+//  mechanisms, or  disassemble this software product or software product
+//  license. CyanDark may terminate this license if you don't comply with
+//  any of the  terms  and conditions  set  forth in our end user license
+//  agreement (EULA).  In such event, licensee  agrees to return licensor
+//  or  destroy all copies  of  software  upon termination of the license
+?>
+<div class="title_row first">
+	<h3><?php $this->_("Cpe.emailforwarder");?></h3>
+</div>
+<div class="pad">
+	<?php $this->Form->create(); ?>
+		<ul>
+			<li>
+				<label for="username"><?= Language::_("Cpe.label.email", true); ?></label>
+				<input type="text" name="email" value="" id="email" class="form-control">
+				<span style=" padding-left: 10px; ">@<?= $service_fields->cpanel_domain; ?></span>
+			</li>
+			<li>
+				<label for="username"><?= Language::_("Cpe.label.pointsto", true); ?></label>
+				<input type="text" name="fwdemail" value="" id="fwdemail" class="form-control">
+			</li>
+		</ul>
+		<div class="button_row">
+			<a class="btn_right submit" href="#"><?= Language::_("Cpe.button.save", true); ?></a>
+		</div>
+	<?php $this->Form->end(); ?>
+</div>
+
+<div class="title_row">
+	<h3><?php $this->_("Cpe.emailforwarder");?></h3>
+</div>
+<div class="pad">
+	<table class="table">
+		<thead>
+			<tr class="heading_row">
+				<td><span><?php $this->_("Cpe.label.email");?></span></td>
+				<td><span><?php $this->_("Cpe.label.pointsto");?></span></td>
+			</tr>
+		</thead>
+		<tbody>
+		<?php $i = 1; ?>
+		<?php foreach($response->cpanelresult->data as $entry){ ?>
+			<tr <?php if($i % 2 == 0){ ?>class="odd_row"<?php } ?>>
+				<td><?= $entry->dest; ?></td>
+				<td><?= $entry->forward; ?></td>
+			</tr>
+			<?php $i++; ?>
+		<?php } ?>
+		</tbody>
+	</table>
+</div>
+
+<div class="title_row">
+	<h3><?php $this->_("Cpe.emailforwarder.delete");?></h3>
+</div>
+<div class="pad">
+	<?php $this->Form->create(); ?>
+		<ul>
+			<li>
+				<label for="username"><?= Language::_("Cpe.label.email", true); ?></label>
+				<input type="text" name="email_f" value="" id="email_f" class="form-control">
+				<span style=" padding-left: 10px; ">@<?= $service_fields->cpanel_domain; ?></span>
+			</li>
+			<li>
+				<label for="username"><?= Language::_("Cpe.label.pointsto", true); ?></label>
+				<input type="text" name="emaildest" value="" id="emaildest" class="form-control">
+			</li>
+		</ul>
+		<div class="button_row">
+			<a class="btn_right submit" href="#"><?= Language::_("Cpe.emailforwarder.delete", true); ?></a>
+		</div>
+	<?php $this->Form->end(); ?>
+</div>

@@ -5,7 +5,6 @@
 
 // Basics
 $lang['Cpe.name'] = "cPanel Extendido";
-$lang['Cpe.update_available'] = "ACTUALIZACION DISPONIBLE";
 $lang['Cpe.module_row'] = "Servidor";
 $lang['Cpe.module_row_plural'] = "Servidores";
 $lang['Cpe.module_group'] = "Grupo de Servidores";
@@ -184,17 +183,18 @@ $lang['Cpe.button.deletesubdomain'] = "Eliminar Subdominio";
 $lang['Cpe.button.deleteparked'] = "Eliminar Dominio Aparcado";
 
 // Labels
-$lang['Cpe.label.nameservers'] = "Servidores de Nombres";
+$lang['Cpe.label.suspension_reason'] = "Razón de Suspensión";
+$lang['Cpe.label.nameservers'] = "Servidores DNS";
 $lang['Cpe.label.ipaddress'] = "Dirección IP";
 $lang['Cpe.label.server'] = "Servidor";
 $lang['Cpe.label.webmailaddress'] = "Webmail Address";
 $lang['Cpe.label.mailhost'] = "Hostname POP3/IMAP";
-$lang['Cpe.label.pop3port'] = "POP3 Port";
-$lang['Cpe.label.imapport'] = "IMAP Port";
-$lang['Cpe.label.smtpport'] = "IMAP Port";
-$lang['Cpe.label.imapportssl'] = "IMAP Port (SSL)";
-$lang['Cpe.label.pop3portssl'] = "POP3 Port (SSL)";
-$lang['Cpe.label.smtpportssl'] = "SMTP Port (SSL)";
+$lang['Cpe.label.pop3port'] = "Puerto POP3";
+$lang['Cpe.label.imapport'] = "Puerto IMAP";
+$lang['Cpe.label.smtpport'] = "Puerto IMAP";
+$lang['Cpe.label.imapportssl'] = "Puerto IMAP (SSL)";
+$lang['Cpe.label.pop3portssl'] = "Puerto POP3 (SSL)";
+$lang['Cpe.label.smtpportssl'] = "Puerto SMTP (SSL)";
 $lang['Cpe.label.yourusername'] = "Direción de E-mail del Usuario";
 $lang['Cpe.label.yourpassword'] = "Contraseña de E-mail del Usuario";
 $lang['Cpe.label.ftphost'] = "Host FTP";
@@ -275,6 +275,7 @@ $lang['Cpe.label.port'] = "Puerto";
 $lang['Cpe.label.add_new'] = "Añadir";
 $lang['Cpe.label.enable'] = "Activar";
 $lang['Cpe.label.disable'] = "Desactivar";
+$lang['Cpe.label.domainfield'] = "Detectar Dominio Automaticamente (Si es detectado, se ocultara el campo)";
 $lang['Cpe.label.usernamefield'] = "Campo de Usuario";
 $lang['Cpe.label.passwordfield'] = "Campo de Contraseña";
 $lang['Cpe.label.diskreseller'] = "Espacio de Revendedor";
@@ -283,6 +284,7 @@ $lang['Cpe.label.bandreseller'] = "Ancho de Banda de Revendedor";
 // Tooltip
 $lang['Cpe.tooltip.quota'] = "Proporcionar una cuota en megabytes, 0 indica que es ilimitada";
 $lang['Cpe.tooltip.bandwidth'] = "Introduzca un límite de ancho de banda mensual en megabytes, 0 indica que es ilimitada";
+$lang['Cpe.tooltip.suspension_reason'] = "Llenar solo si se esta suspendiendo el servicio, El cliente puede ver la razón.";
 
 // Cron specified
 $lang['Cpe.cron.commonsettings'] = "-- Ajustes comunes --";
@@ -417,6 +419,7 @@ $lang['Cpe.add_row.box_title'] = "Agregar servidor cPanel";
 $lang['Cpe.add_row.basic_title'] = "Ajustes Básicos";
 $lang['Cpe.add_row.name_servers_title'] = "Nombre de Servidores";
 $lang['Cpe.add_row.notes_title'] = "Notas";
+$lang['Cpe.add_row.pagetoimage_title'] = "Page2Image API";
 $lang['Cpe.add_row.name_server_btn'] = "Añadir nombre de servidor adicional";
 $lang['Cpe.add_row.name_server_col'] = "Nombre del Servidor";
 $lang['Cpe.add_row.name_server_host_col'] = "Nombre del Host";
@@ -440,6 +443,7 @@ $lang['Cpe.row_meta.host_name'] = "Nombre de Host";
 $lang['Cpe.row_meta.user_name'] = "Usuario";
 $lang['Cpe.row_meta.key'] = "Clave a distacia";
 $lang['Cpe.row_meta.password'] = "Contraseña";
+$lang['Cpe.row_meta.pagetoimage_key'] = "Clave del API";
 $lang['Cpe.row_meta.use_ssl'] = "Usar SSL para conectar a la API (recomendado)";
 $lang['Cpe.row_meta.account_limit'] = "Cuenta Limitada";
 

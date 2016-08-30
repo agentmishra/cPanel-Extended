@@ -13,7 +13,7 @@ class cpanelextended extends Module {
 	/**
 	 * @var string The version of this module
 	 */
-	private static $version = "4.3";
+	private static $version = "5.0";
 	/**
 	 * @var string The authors of this module
 	 */
@@ -36,20 +36,6 @@ class cpanelextended extends Module {
 		));
 		// Load the language required by this module
 		Language::loadLang("cpanelextended", null, dirname(__FILE__) . DS . "language" . DS);
-		//Check if an update is available
-		$update = $this->updateCheck(self::$version);
-		if($update['update']) {
-			self::$authors = array(
-				array(
-					"name" => "CyanDark, Inc.",
-					"url" => "http://cyandark.com"
-				),
-				array(
-					"name" => Language::_("Cpe.update_available", true) . ' ' . $update['version'],
-					"url" => $update['download']
-				)
-			);
-		}
 	}
 	/**
 	 * Returns the name of this module
@@ -83,7 +69,7 @@ class cpanelextended extends Module {
 	 * @return array An array of tabs in the format of method => title. Example: array('methodName' => "Title", 'methodName2' => "Title2")
 	 */
 	public function getAdminTabs($package = null) {
-		/*if($package->meta->details == 'true') {
+		if($package->meta->details == 'true') {
 			$tabs["tabDetails"] = Language::_("Cpe.details", true);
 		}
 		if($package->meta->statistics == 'true') {
@@ -97,9 +83,6 @@ class cpanelextended extends Module {
 		}
 		if($package->meta->webdisk == 'true') {
 			$tabs["tabWebdisk"] = Language::_("Cpe.webdisk", true);
-		}
-		if($package->meta->backups == 'true') {
-			$tabs["tabBackups"] = Language::_("Cpe.backups", true);
 		}
 		if($package->meta->databases == 'true') {
 			$tabs["tabDatabases"] = Language::_("Cpe.databases", true);
@@ -128,23 +111,16 @@ class cpanelextended extends Module {
 		if($package->meta->cron == 'true') {
 			$tabs["tabCron"] = Language::_("Cpe.cron", true);
 		}
-		if($package->meta->blockip == 'true') {
-			$tabs["tabIpblocker"] = Language::_("Cpe.blockip", true);
-		}
 		if($package->meta->ssh == 'true') {
 			$tabs["tabSsh"] = Language::_("Cpe.ssh", true);
 		}
 		if($package->meta->ssl == 'true') {
 			$tabs["tabSsl"] = Language::_("Cpe.ssl", true);
 		}
-		if($package->meta->softaculous == 'true') {
-			$tabs["tabManageapps"] = Language::_("Cpe.softaculous", true);
-		}
 		if($package->meta->loginto == 'true') {
 			$tabs["tabLoginto"] = Language::_("Cpe.loginto", true);
 		}
-		return $tabs;*/
-        return array();
+		return $tabs;
 	}
 	/**
 	 * Returns all tabs to display to a client when managing a service whose
@@ -292,11 +268,13 @@ class cpanelextended extends Module {
 	 * @return string A value used to identify this service amongst other similar services
 	 */
 	public function getServiceName($service) {
+		$fields_array = array();
 		foreach($service->fields as $field) {
+			$fields_array[$field->key] = $field->value;
 			if($field->key == "cpanel_domain")
 				return $field->value;
 		}
-		return null;
+		return null;		
 	}
 	/**
 	 * Returns the value used to identify a particular package service which has
@@ -481,14 +459,14 @@ class cpanelextended extends Module {
 				if(!empty($package->meta->diskreseller) && !empty($package->meta->bandreseller)) {
 					Loader::load(dirname(__FILE__) . DS . "api" . DS . "xmlapi.php");
 					$xmlapi = new xmlapi($row->meta->host_name, $row->meta->user_name, $row->meta->password);
-					$params = array(
+					$params_api = array(
 						'user' => $vars['cpanel_username'],
 						'enable_resource_limits' => 1,
 						'diskspace_limit' => $package->meta->diskreseller,
 						'bandwidth_limit' => $package->meta->bandreseller
 					);
-					$this->log($row->meta->host_name . "|setresellerlimits", serialize($params), "input", true);
-					$response = $xmlapi->setresellerlimits($params);
+					$this->log($row->meta->host_name . "|setresellerlimits", serialize($params_api), "input", true);
+					$response = $xmlapi->setresellerlimits($params_api);
 				}
 			}
 			// Update the number of accounts on the server
@@ -535,7 +513,7 @@ class cpanelextended extends Module {
 	 * @see Module::getModuleRow()
 	 */
 	public function editService($package, $service, array $vars = array(), $parent_package = null, $parent_service = null) {
-		$row    = $this->getModuleRow();
+ 		$row    = $this->getModuleRow();
 		$fields = $this->serviceFieldsToObject($service->fields);
 		$api    = $this->getApiByMeta($row->meta, $fields->cpanel_username);
 		$params = $fields;
@@ -545,6 +523,10 @@ class cpanelextended extends Module {
 		// Remove password if not being updated
 		if(isset($vars['cpanel_password']) and $vars['cpanel_password'] == "")
 			unset($vars['cpanel_password']);
+		// Update suspension reason (if changed)
+		if(isset($vars['cpanel_suspension_reason'])) {
+			$fields->cpanel_suspension_reason = $vars['cpanel_suspension_reason'];
+		}
 		// Only update the service if 'use_module' is true
 		if($vars['use_module'] == "true") {
 			// Check for fields that changed
@@ -583,8 +565,35 @@ class cpanelextended extends Module {
 				if(!$this->Input->errors())
 					$fields->cpanel_username = $delta['cpanel_username'];
 			}
+			// If reseller and we have an ACL set, update the reseller's ACL
+			if($package->meta->type == "reseller") {
+				if($package->meta->acl != "") {
+					$api->setacls(array(
+						'reseller' => $delta['cpanel_username'],
+						'acllist' => $package->meta->acl
+					));
+				}
+				// Set Space Limit for Resellers
+				if(!empty($package->meta->diskreseller) && !empty($package->meta->bandreseller)) {
+					Loader::load(dirname(__FILE__) . DS . "api" . DS . "xmlapi.php");
+					$xmlapi = new xmlapi($row->meta->host_name, $row->meta->user_name, $row->meta->password);
+					$params = array(
+						'user' => $vars['cpanel_username'],
+						'enable_resource_limits' => 1,
+						'diskspace_limit' => $package->meta->diskreseller,
+						'bandwidth_limit' => $package->meta->bandreseller
+					);
+					$this->log($row->meta->host_name . "|setresellerlimits", serialize($params), "input", true);
+					$response = $xmlapi->setresellerlimits($params);
+				}
+			}
 		}
 		return array(
+			array(
+				'key' => "cpanel_suspension_reason",
+				'value' => $fields->cpanel_suspension_reason,
+				'encrypted' => 0
+			),
 			array(
 				'key' => "cpanel_domain",
 				'value' => $fields->cpanel_domain,
@@ -1095,6 +1104,7 @@ class cpanelextended extends Module {
 	 * @param stdClass $module_row The stdClass representation of the existing module row
 	 */
 	public function deleteModuleRow($module_row) {
+		return;
 	}
 	/**
 	 * Returns all fields used when adding/editing a package, including any
@@ -1145,7 +1155,6 @@ class cpanelextended extends Module {
 			foreach($keys as $key => $value) {
 				$acls[$key] = $key;
 			}
-			//$fields->setHtml($this->debug($acls));
 			$packages = array(
 				"" => Language::_('Cpe.label.defaultpackage', true)
 			) + $this->ArrayHelper->numericToKey($pkglist->package, "name", "name");
@@ -1157,6 +1166,12 @@ class cpanelextended extends Module {
 			'id' => "cpanel_package"
 		)));
 		$fields->setField($package);
+		$domainfield = $fields->label(Language::_('Cpe.label.domainfield', true), "cpanel_domainfield");
+		$domainfield->attach($fields->fieldSelect("meta[domainfield]", array(
+			"true" => Language::_('Cpe.label.enable', true),
+			"false" => Language::_('Cpe.label.disable', true)
+		), $this->Html->ifSet($vars->meta['domainfield'])));
+		$fields->setField($domainfield);
 		$usernamefield = $fields->label(Language::_('Cpe.label.usernamefield', true), "cpanel_usernamefield");
 		$usernamefield->attach($fields->fieldSelect("meta[usernamefield]", array(
 			"true" => Language::_('Cpe.label.enable', true),
@@ -1437,6 +1452,7 @@ class cpanelextended extends Module {
 				'acl'
 			),
 			'service' => array(
+				'cpanel_suspension_reason',
 				'cpanel_username',
 				'cpanel_password',
 				'cpanel_domain'
@@ -1450,19 +1466,41 @@ class cpanelextended extends Module {
 	 * @param $vars stdClass A stdClass object representing a set of post fields
 	 * @return ModuleFields A ModuleFields object, containg the fields to render as well as any additional HTML markup to include
 	 */
-	public function getAdminAddFields($package, $vars = null) {
+	public function getAdminAddFields($package, $vars = null, $edit = false) {
 		Loader::loadHelpers($this, array(
 			"Html"
 		));
 		$fields = new ModuleFields();
-		// Create domain label
-		$domain = $fields->label(Language::_('Cpe.label.domain', true), "cpanel_domain");
-		// Create domain field and attach to domain label
-		$domain->attach($fields->fieldText("cpanel_domain", $this->Html->ifSet($vars->cpanel_domain), array(
-			'id' => "cpanel_domain"
-		)));
-		// Set the label as a field
-		$fields->setField($domain);
+		if($edit){
+			// Create suspension reason label
+			$suspension_reason = $fields->label(Language::_('Cpe.label.suspension_reason', true), "cpanel_suspension_reason");
+			// Create domain field and attach to domain label
+			$suspension_reason->attach($fields->fieldText("cpanel_suspension_reason", $this->Html->ifSet($vars->cpanel_suspension_reason), array(
+				'id' => "cpanel_suspension_reason"
+			)));
+			// Add tooltip
+			$tooltip = $fields->tooltip(Language::_("Cpe.tooltip.suspension_reason", true));
+			$suspension_reason->attach($tooltip);
+			// Set the label as a field
+			$fields->setField($suspension_reason);
+		}
+		if(!empty($_SESSION['1-order-domain']['domain-name']) && $this->validateHostName($_SESSION['1-order-domain']['domain-name']) && isset($vars->uuid) && $package->meta->domainfield == 'true'){
+			// Create domain field
+			$domain = $fields->fieldHidden("cpanel_domain", $this->Html->ifSet($_SESSION['1-order-domain']['domain']), array(
+				'id' => "cpanel_domain"
+			));
+			// Set the label as a field
+			$fields->setField($domain);
+		} else {
+			// Create domain label
+			$domain = $fields->label(Language::_('Cpe.label.domain', true), "cpanel_domain");
+			// Create domain field and attach to domain label
+			$domain->attach($fields->fieldText("cpanel_domain", $this->Html->ifSet($vars->cpanel_domain), array(
+				'id' => "cpanel_domain"
+			)));
+			// Set the label as a field
+			$fields->setField($domain);
+		}
 		if($package->meta->usernamefield == 'true') {
 			// Create username label
 			$username = $fields->label(Language::_('Cpe.label.username', true), "cpanel_username");
@@ -1513,7 +1551,7 @@ class cpanelextended extends Module {
 	 */
 	public function getAdminEditFields($package, $vars = null) {
 		// Same as adding
-		return $this->getAdminAddFields($package, $vars);
+		return $this->getAdminAddFields($package, $vars, true);
 	}
 	/**
 	 * Fetches the HTML content to display when viewing the service info in the
@@ -1529,6 +1567,10 @@ class cpanelextended extends Module {
 		$this->view           = new View("admin_service_info", "default");
 		$this->view->base_uri = $this->base_uri;
 		$this->view->setDefaultView("components" . DS . "modules" . DS . "cpanelextended" . DS);
+		// Get Services Fields
+		$fields = $this->serviceFieldsToObject($service->fields);
+		// Generate SSO Link
+		$sso = $this->sso($fields->cpanel_username);
 		// Load the helpers required for this view
 		Loader::loadHelpers($this, array(
 			"Form",
@@ -1537,7 +1579,8 @@ class cpanelextended extends Module {
 		$this->view->set("module_row", $row);
 		$this->view->set("package", $package);
 		$this->view->set("service", $service);
-		$this->view->set("service_fields", $this->serviceFieldsToObject($service->fields));
+		$this->view->set("sso", $sso);
+		$this->view->set("fields", $fields);
 		return $this->view->fetch();
 	}
 	/**
@@ -1555,6 +1598,13 @@ class cpanelextended extends Module {
 		$this->view->base_uri = $this->base_uri;
 		$this->view->setDefaultView("components" . DS . "modules" . DS . "cpanelextended" . DS);
 		$this->uri = $this->base_uri . "services/manage/" . $service->id . "/";
+		// Get Services Fields
+		$fields = $this->serviceFieldsToObject($service->fields);
+		// Array with SSO links
+		$sso = array(
+			'cpanel' => $this->sso($fields->cpanel_username),
+			'filemanager' => $this->sso($fields->cpanel_username, 'FileManager_Home')
+		);
 		// Load the helpers required for this view
 		Loader::loadHelpers($this, array(
 			"Form",
@@ -1562,6 +1612,7 @@ class cpanelextended extends Module {
 		));
 		$this->view->set("module_row", $row);
 		$this->view->set("package", $package);
+		$this->view->set("sso", $sso);
 		$this->view->set("service", $service);
 		$this->view->set("service_uri", $this->uri);
 		$this->view->set("service_fields", $this->serviceFieldsToObject($service->fields));
@@ -1588,7 +1639,8 @@ class cpanelextended extends Module {
 			"account_limit",
 			"account_count",
 			"name_servers",
-			"port_number"
+			"port_number",
+			"pagetoimage_key"
 		);
 		$encrypted   = array(
 			"username",
@@ -1870,6 +1922,9 @@ class cpanelextended extends Module {
 				$user_stats[$stats_v->cpanelresult->data[$key]->name]['class'] = "";
 			}
 		}
+		// Get Screenshoot (Page2Images)
+		$image_url = $this->screenshot($fields->cpanel_domain, $row->meta->pagetoimage_key);
+		$this->view->set("image_url", $image_url);
 		$this->view->set("stats_v", $user_stats);
 		$this->view->set("name_servers", $row->meta->name_servers);
 		return $this->view->fetch();
@@ -1947,15 +2002,15 @@ class cpanelextended extends Module {
 		$fields     = $this->serviceFieldsToObject($service->fields);
 		$api        = $this->getApiByMeta($row->meta, $fields);
 		$this->vars = $this->getPageVars($vars);
-		//Change Password
+		// Change Password
 		if(!isset($this->Record))
 			Loader::loadComponents($this, array(
 				"Record"
 			));
-		//Comparing Passwords
+		// Comparing Passwords
 		if(!empty($post)) {
 			$stats = new stdClass();
-			if($post['pass'] == $post['pass_confirm']) {
+			if($post['pass'] == $post['pass_confirm'] && !empty($post['pass']) && strlen($post['pass']) > 7 ) {
 				$pass_defined = trim($post['pass']);
 				$params       = array(
 					'user' => $fields->cpanel_username,
@@ -1988,7 +2043,7 @@ class cpanelextended extends Module {
 	 */
 	public function zoneeditor($package, $service, array $get = null, array $post = null, array $files = null) {
 		global $out;
-		//Add DNS
+		// Add DNS
 		if(isset($post['ttl']) && isset($post['name']) && isset($post['record']) && isset($post['type']) && !($post['type'] == 'MX')) {
 			$row            = $this->getModuleRow();
 			$fields         = $this->serviceFieldsToObject($service->fields);
@@ -2008,7 +2063,7 @@ class cpanelextended extends Module {
 			$this->log($row->meta->host_name . "|sendApi2Request", serialize($params), "input", true);
 			$response = $this->parseResponse($api->sendApi2Request("ZoneEdit", "add_zone_record", $params));
 		}
-		//Add MX
+		// Add MX
 		if(isset($post['ttl']) && isset($post['record']) && isset($post['type']) && $post['type'] == 'MX') {
 			$row            = $this->getModuleRow();
 			$fields         = $this->serviceFieldsToObject($service->fields);
@@ -2023,7 +2078,7 @@ class cpanelextended extends Module {
 			$this->log($row->meta->host_name . "|sendApi2Request", serialize($params), "input", true);
 			$response = $this->parseResponse($api->sendApi2Request("Email", "addmx", $params));
 		}
-		//Delete Zone
+		// Delete Zone
 		if(isset($_GET['delete'])) {
 			$row            = $this->getModuleRow();
 			$fields         = $this->serviceFieldsToObject($service->fields);
@@ -2037,7 +2092,7 @@ class cpanelextended extends Module {
 			$this->log($row->meta->host_name . "|sendApi2Request", serialize($params), "input", true);
 			$response = $this->parseResponse($api->sendApi2Request("ZoneEdit", "remove_zone_record", $params));
 		}
-		//Delete MX
+		// Delete MX
 		if(isset($_GET['deletemx']) && isset($_GET['pref'])) {
 			$row            = $this->getModuleRow();
 			$fields         = $this->serviceFieldsToObject($service->fields);
@@ -2084,7 +2139,7 @@ class cpanelextended extends Module {
 	 */
 	public function emailforwarder($package, $service, array $get = null, array $post = null, array $files = null) {
 		global $out;
-		//Add Forwarder
+		// Add Forwarder
 		if(isset($post['email']) && isset($post['fwdemail'])) {
 			$row            = $this->getModuleRow();
 			$fields         = $this->serviceFieldsToObject($service->fields);
@@ -2100,7 +2155,7 @@ class cpanelextended extends Module {
 			$this->log($row->meta->host_name . "|sendApi2Request", serialize($params), "input", true);
 			$response = $this->parseResponse($api->sendApi2Request("Email", "addforward", $params));
 		}
-		//Remove Forwarder
+		// Remove Forwarder
 		if(isset($post['email_f']) && isset($post['emaildest'])) {
 			$row            = $this->getModuleRow();
 			$fields         = $this->serviceFieldsToObject($service->fields);
@@ -2118,7 +2173,7 @@ class cpanelextended extends Module {
 		$fields         = $this->serviceFieldsToObject($service->fields);
 		$service_fields = $this->serviceFieldsToObject($service->fields);
 		$api            = $this->getApiByMeta($row->meta, $fields);
-		//Get Forwarders
+		// Get Forwarders
 		$stats          = new stdClass();
 		$params         = array(
 			'domain' => $service_fields->cpanel_domain
@@ -2219,7 +2274,6 @@ class cpanelextended extends Module {
 				break;
 		}
 		$api->sendApi2Request("Ftp", "listftpwithdisk");
-		//$this->parseResponse($api->getCleanResponse());
 		if($api->isSuccess()) {
 			$this->prepareView("ftpaccounts", compact("fields"));
 			//$this->Javascript->setFile("cpanelextended.functions.js", "head", "components" . DS . "modules" . DS . "cpanelextended" . DS . "views" . DS . "default" . DS . "javascript" . DS);
@@ -2261,6 +2315,20 @@ class cpanelextended extends Module {
 					"password" => $post["dbpassword"]
 				))) {
 					return $this->printJson($this->parseResponseToJson($api->getCleanResponse()));
+				}
+				break;
+			case "changepassworduser":
+				if(isset($post["password"])){
+					$params = array(
+						'dbuser' => $post["dbusername"],
+						'password' => $post["password"]
+					);
+					$api->sendApi2Request("MysqlFE", "changedbuserpassword", $params);
+					return $this->printJson($this->parseResponseToJson($api->getCleanResponse()));
+				} else {
+					$this->prepareView("databaseschangepassworduser", compact("fields"));
+					$this->view->username = $this->getFromVars($_GET, "dbuser");
+					return $this->showCorrectView($this->view);
 				}
 				break;
 			case "addusertodb":
@@ -2936,7 +3004,7 @@ class cpanelextended extends Module {
 								"Services"
 							));
 							$add_new = $api->sendApi1Request("DenyIp", "adddenyip", $post);
-							$this->log($row->meta->host_name . "|Add New Denied IP", serialize("adddenyip"), "input", true);
+							$this->log($row->meta->host_name . "|adddenyip", serialize("adddenyip"), "input", true);
 							if(isset($add_new->cpanelresult->error) && !empty($add_new->cpanelresult->error)) {
 								$error = array(
 									0 => array(
@@ -3007,11 +3075,11 @@ class cpanelextended extends Module {
 			if(isset($post['delete_denyip'])) {
 				if(!empty($post['ip'])) {
 					$delete_email = $api->sendApi1Request("DenyIp", "deldenyip", $post);
-					$this->log($row->meta->host_name . "|Delete Denied IP", serialize("deldenyip"), "input", true);
+					$this->log($row->meta->host_name . "|deldenyip", serialize("deldenyip"), "input", true);
 				} else {
 					$error = array(
 						0 => array(
-							"result" => Language::_("tastycpanel.empty_invalid_values", true)
+							"result" => Language::_("Cpe.empty_invalid_values", true)
 						)
 					);
 					$this->Input->setErrors($error[0]);
@@ -3625,15 +3693,23 @@ class cpanelextended extends Module {
 		$fields     = $this->serviceFieldsToObject($service->fields);
 		$api        = $this->getApiByMeta($row->meta, $fields);
 		$this->vars = $this->getPageVars($vars);
+		// Array with SSO links
+		$sso = array(
+			'cpanel' => $this->sso($fields->cpanel_username),
+			'phpmyadmin' => $this->sso($fields->cpanel_username, 'Database_phpMyAdmin'),
+			'filemanager' => $this->sso($fields->cpanel_username, 'FileManager_Home'),
+			'webmail' => $this->sso($fields->cpanel_username, null, 'webmaild'),
+			'whm' => $this->sso($fields->cpanel_username, null, 'whostmgrd')
+		);
 		$this->prepareView("loginto");
 		$this->view->server    = $row;
 		$this->view->fields    = $fields;
-		$this->view->cpanelurl = $api->buildUrl();
 		$this->view->set("package", $package);
+		$this->view->set("sso", $sso);
 		return $this->view->fetch();
 	}
 	/**
-	 * Client Details tab
+	 * Admin Details tab
 	 *
 	 * @param stdClass $package A stdClass object representing the current package
 	 * @param stdClass $service A stdClass object representing the current service
@@ -3646,7 +3722,7 @@ class cpanelextended extends Module {
 		$row        = $this->getModuleRow();
 		$fields     = $this->serviceFieldsToObject($service->fields);
 		$this->vars = $this->getPageVars($vars);
-		$this->prepareView("details");
+		$this->prepareView("admin_details");
 		$stats             = $this->getStats($package, $service);
 		$this->view->stats = $stats;
 		$this->view->set("fields", $fields);
@@ -3670,7 +3746,7 @@ class cpanelextended extends Module {
 		$fields     = $this->serviceFieldsToObject($service->fields);
 		$api        = $this->getApiByMeta($row->meta, $fields);
 		$this->vars = $this->getPageVars($vars);
-		$this->prepareView("stats");
+		$this->prepareView("admin_stats");
 		$stats             = $this->getStats($package, $service);
 		$stats_v           = $api->sendApi2Request("StatsBar", "stat", array(
 			"display" => "hostname|dedicatedip|sharedip|hostingpackage|operatingsystem|cpanelversion|phpversion|diskusage|bandwidthusage|ftpaccounts|emailaccounts|sqldatabases|parkeddomains|addondomains|subdomains"
@@ -3733,7 +3809,7 @@ class cpanelextended extends Module {
 				$this->Record->query("UPDATE `service_fields` SET `value` = '" . $this->ModuleManager->systemEncrypt($pass_defined) . "' WHERE `key` = 'cpanel_confirm_password' AND `service_id` =" . $service->id);
 			}
 		}
-		$this->prepareView("changepass");
+		$this->prepareView("admin_changepass");
 		$this->view->set("response", $response);
 		$this->view->set("row", $row);
 		$this->view->set("fields", $fields);
@@ -3829,7 +3905,7 @@ class cpanelextended extends Module {
 		);
 		$this->log($row->meta->host_name . "|sendApi2Request", serialize($params), "input", true);
 		$response = json_decode($api->sendApi2Request("ZoneEdit", "fetchzone_records", $params), true);
-		$this->prepareView("dns_zone");
+		$this->prepareView("admin_dns_zone");
 		$this->view->set("response", $response);
 		$this->view->set("row", $row);
 		$this->view->set("fields", $fields);
@@ -3892,7 +3968,7 @@ class cpanelextended extends Module {
 		$this->log($row->meta->host_name . "|sendApi2Request", serialize($params), "input", true);
 		//Parse Response
 		$response = $this->parseResponse($api->sendApi2Request("Email", "listforwards", $params));
-		$this->prepareView("emailforwarder");
+		$this->prepareView("admin_emailforwarder");
 		$this->view->set("response", $response);
 		$this->view->set("row", $row);
 		$this->view->set("fields", $fields);
@@ -3914,9 +3990,10 @@ class cpanelextended extends Module {
 	public function tabFtpAccounts($package, $service, array $vars = array(), array $post = array()) {
 		$row        = $this->getModuleRow();
 		$fields     = $this->serviceFieldsToObject($service->fields);
-		$this->vars = $this->getPageVars($vars);
+		$vars       = $this->getPageVars($vars);
+		$this->vars = $vars;
 		$api        = $this->getApiByMeta($row->meta, $fields);
-		switch($this->vars->action) {
+		switch($vars->param1) {
 			case "listftp":
 				if($api->sendApi2Request("Ftp", "listftpwithdisk")->isSuccess()) {
 					$this->printJson($api->getResponse());
@@ -3944,7 +4021,7 @@ class cpanelextended extends Module {
 						$this->printJson($this->parseResponseToJson($api->getCleanResponse()));
 					}
 				} else {
-					$this->view           = $this->prepareView("ftpdelete", compact("fields"));
+					$this->view           = $this->prepareView("admin_ftpdelete", compact("fields"));
 					$this->view->username = $this->getFromVars($_GET, "username");
 					//$this->view->uri = $this->base_uri . "services/manage/" . $vars->serviceid . "/" . $vars->pagename . "/";
 					return $this->showCorrectView($this->view);
@@ -3959,7 +4036,7 @@ class cpanelextended extends Module {
 						$this->printJson($this->parseResponseToJson($api->getCleanResponse()));
 					}
 				} else {
-					$this->view           = $this->prepareView("ftpchangepassword", compact("fields"));
+					$this->view           = $this->prepareView("admin_ftpchangepassword", compact("fields"));
 					$this->view->username = $this->getFromVars($_GET, 'username', $fields->cpanel_username);
 					return $this->showCorrectView($this->view);
 				}
@@ -3974,10 +4051,9 @@ class cpanelextended extends Module {
 						$this->printJson($this->parseResponseToJson($api->getCleanResponse()));
 					}
 				} else {
-					$this->view               = $this->prepareView("ftpchangequota", compact("fields"));
+					$this->view               = $this->prepareView("admin_ftpchangequota", compact("fields"));
 					$this->view->currentQuota = $this->getFromVars($_GET, 'currentQuota', 'unlimited');
 					$this->view->currentUser  = $this->getFromVars($_GET, 'username', $fields->cpanel_username);
-					//$this->view->uri = $this->base_uri . "services/manage/" . $vars->serviceid . "/" . $vars->pagename . "/" . $vars->action .'?currentQuota='.$this->getFromVars($_GET, 'currentQuota', 'unlimited').'&username='.$this->getFromVars($_GET, 'username', urlencode($fields->cpanel_username.'@'.$fields->cpanel_domain));
 					return $this->showCorrectView($this->view);
 				}
 				break;
@@ -3985,12 +4061,9 @@ class cpanelextended extends Module {
 				break;
 		}
 		$api->sendApi2Request("Ftp", "listftpwithdisk");
-		//$this->parseResponse($api->getCleanResponse());
 		if($api->isSuccess()) {
-			$this->prepareView("ftpaccounts", compact("fields"));
-			//$this->Javascript->setFile("cpanelextended.functions.js", "head", "components" . DS . "modules" . DS . "cpanelextended" . DS . "views" . DS . "default" . DS . "javascript" . DS);
+			$this->prepareView("admin_ftpaccounts", compact("fields"));
 			$this->view->accounts = $api->getResponse();
-			//$this->view->uri = $this->base_uri . "services/manage/" . $vars->serviceid . "/" . $vars->pagename . '/';
 			return $this->view->fetch();
 		} else {
 			return $api->getResultMessage();
@@ -4013,12 +4086,25 @@ class cpanelextended extends Module {
 		$vars       = $this->getPageVars($vars);
 		$this->vars = $vars;
 		$this->uri  = $this->base_uri . "services/manage/" . $vars->serviceid . "/" . $vars->pagename . '/';
-		switch($vars->action) {
+        switch($vars->param1) {
 			case "adddb":
 				if($api->sendApi1Request("Mysql", "adddb", array(
 					"dbname" => $post["dbname"]
 				))) {
 					return $this->printJson($this->parseResponseToJson($api->getCleanResponse()));
+				}
+				break;
+			case "changepassworduser":
+				if(isset($post["password"])){
+					$params = array(
+						'dbuser' => $post["dbusername"],
+						'password' => $post["password"]
+					);
+					$api->sendApi2Request("MysqlFE", "changedbuserpassword", $params);
+				} else {
+					$this->prepareView("admin_databaseschangepassworduser", compact("fields"));
+					$this->view->username = $this->getFromVars($_GET, "dbuser");
+					return $this->showCorrectView($this->view);
 				}
 				break;
 			case "adduser":
@@ -4060,7 +4146,7 @@ class cpanelextended extends Module {
 				} else {
 					$db       = $this->getFromVars($_GET, "database");
 					$username = $this->getFromVars($_GET, "username");
-					$this->prepareView("databaseschangeprivileges", compact("fields"));
+					$this->prepareView("admin_databaseschangeprivileges", compact("fields"));
 					$this->view->database = $db;
 					$this->view->username = $username;
 					if($api->sendApi2Request("MysqlFE", "userdbprivs", array(
@@ -4080,7 +4166,7 @@ class cpanelextended extends Module {
 						return $this->printJson($this->parseResponseToJson($api->getCleanResponse()));
 					}
 				} else {
-					$this->prepareView("databasesdeleteuser", compact("fields"));
+					$this->prepareView("admin_databasesdeleteuser", compact("fields"));
 					$this->view->username = $this->getFromVars($_GET, "dbuser");
 					return $this->showCorrectView($this->view);
 				}
@@ -4093,7 +4179,7 @@ class cpanelextended extends Module {
 						return $this->printJson($this->parseResponseToJson($api->getCleanResponse()));
 					}
 				} else {
-					$this->prepareView("databasesdeletedb", compact("fields"));
+					$this->prepareView("admin_databasesdeletedb", compact("fields"));
 					$this->view->dbname = $this->getFromVars($_GET, "dbname");
 					return $this->showCorrectView($this->view);
 				}
@@ -4102,7 +4188,7 @@ class cpanelextended extends Module {
 				break;
 		}
 		if($api->sendApi2Request("MysqlFE", "listdbs")->isSuccess() and $api2->sendApi2Request("MysqlFE", "listusers")->isSuccess()) {
-			$this->prepareView("databases", compact("fields"));
+			$this->prepareView("admin_databases", compact("fields"));
 			$this->view->databases   = $api->getResponse();
 			$this->view->users       = $api2->getResponse();
 			$this->view->username    = $fields->cpanel_username;
@@ -4147,7 +4233,7 @@ class cpanelextended extends Module {
 			$response = $this->parseResponse($api->sendApi2Request("MysqlFE", "deauthorizehost", $params));
 		}
 		if($api->sendApi2Request("MysqlFE", "listhosts")->isSuccess()) {
-			$this->prepareView("remotedatabase", compact("fields"));
+			$this->prepareView("admin_remotedatabase", compact("fields"));
 			$this->view->hosts = $api->getResponse();
 			return $this->view->fetch();
 		} else {
@@ -4170,7 +4256,7 @@ class cpanelextended extends Module {
 		$api2       = clone $api;
 		$vars       = $this->getPageVars($vars);
 		$this->vars = $vars;
-		switch($vars->action) {
+		switch($vars->param1) {
 			case "create":
 				if(!empty($post)) {
 					if($api->sendApi2Request("Email", "addpop", array(
@@ -4194,7 +4280,7 @@ class cpanelextended extends Module {
 					}
 				} else {
 					@list($username, $domain) = explode("@", $this->getFromVars($_GET, "username", $fields->cpanel_username . '@' . $fields->cpanel_domain));
-					$this->prepareView("emailschangequota");
+					$this->prepareView("admin_emailschangequota");
 					$this->view->username = $username;
 					$this->view->domain   = $domain;
 					$this->view->quota    = $this->getFromVars($_GET, "currentQuota", 0);
@@ -4212,7 +4298,7 @@ class cpanelextended extends Module {
 					}
 				} else {
 					@list($username, $domain) = explode("@", $this->getFromVars($_GET, "username", $fields->cpanel_username . '@' . $fields->cpanel_domain));
-					$this->prepareView("emailschangepassword");
+					$this->prepareView("admin_emailschangepassword");
 					$this->view->username = $username;
 					$this->view->domain   = $domain;
 					return $this->showCorrectView($this->view);
@@ -4228,7 +4314,7 @@ class cpanelextended extends Module {
 					}
 				} else {
 					@list($username, $domain) = explode("@", $this->getFromVars($_GET, "username", $fields->cpanel_username . '@' . $fields->cpanel_domain));
-					$this->prepareView("emailsdelete");
+					$this->prepareView("admin_emailsdelete");
 					$this->view->username = $username;
 					$this->view->domain   = $domain;
 					return $this->showCorrectView($this->view);
@@ -4238,7 +4324,7 @@ class cpanelextended extends Module {
 				break;
 		}
 		if($api->sendApi2Request("Email", "listpopswithdisk")->isSuccess()) {
-			$this->prepareView("emails");
+			$this->prepareView("admin_emails");
 			$domains              = $api2->sendApi2Request("Email", "listmaildomains", array(
 				"user" => $fields->cpanel_username
 			))->getResponse();
@@ -4264,8 +4350,9 @@ class cpanelextended extends Module {
 		$row        = $this->getModuleRow();
 		$fields     = $this->serviceFieldsToObject($service->fields);
 		$api        = $this->getApiByMeta($row->meta, $fields);
-		$this->vars = $this->getPageVars($vars);
-		switch($this->vars->action) {
+		$vars       = $this->getPageVars($vars);
+		$this->vars = $vars;
+		switch($vars->param1) {
 			case "create":
 				if($api->sendApi2Request("SubDomain", "addsubdomain", array(
 					'domain' => $post["subdomainname"],
@@ -4284,7 +4371,7 @@ class cpanelextended extends Module {
 						$this->printJson($this->parseResponseToJson($api->getCleanResponse()));
 					}
 				} else {
-					$this->prepareView("subdomainredirect");
+					$this->prepareView("admin_subdomainredirect");
 					$this->view->subdomain = $this->getFromVars($_GET, "domain");
 					return $this->showCorrectView($this->view);
 				}
@@ -4304,14 +4391,14 @@ class cpanelextended extends Module {
 						$this->printJson($this->parseResponseToJson($api->getCleanResponse()));
 					}
 				} else {
-					$this->prepareView("subdomaindelete");
+					$this->prepareView("admin_subdomaindelete");
 					$this->view->subdomain = $this->getFromVars($_GET, "domain");
 					return $this->showCorrectView($this->view);
 				}
 				break;
 		}
 		if($api->sendApi2Request("SubDomain", "listsubdomains")->isSuccess()) {
-			$this->prepareView("subdomains");
+			$this->prepareView("admin_subdomains");
 			$this->view->subdomains = $api->getResponse();
 			$domains                = $api->sendApi2Request("DomainLookup", "getbasedomains", array(
 				"user" => $fields->cpanel_username
@@ -4335,9 +4422,9 @@ class cpanelextended extends Module {
 		$row    = $this->getModuleRow();
 		$fields = $this->serviceFieldsToObject($service->fields);
 		$api    = $this->getApiByMeta($row->meta, $fields);
-		;
-		$this->vars = $this->getPageVars($vars);
-		switch($this->vars->action) {
+		$vars       = $this->getPageVars($vars);
+		$this->vars = $vars;
+		switch($vars->param1) {
 			case "create":
 				if($api->sendApi1Request("Ftp", "addFtp", array(
 					'user' => $post["domainusername"],
@@ -4369,7 +4456,7 @@ class cpanelextended extends Module {
 						$this->printJson($this->parseResponseToJson($api->getCleanResponse()));
 					}
 				} else {
-					$this->prepareView("addondomainsredirect");
+					$this->prepareView("admin_addondomainsredirect");
 					$this->view->domain    = $this->getFromVars($_GET, 'domain');
 					$this->view->subdomain = $this->getFromVars($_GET, 'subdomain');
 					return $this->showCorrectView($this->view);
@@ -4384,7 +4471,7 @@ class cpanelextended extends Module {
 						$this->printJson($this->parseResponseToJson($api->getCleanResponse()));
 					}
 				} else {
-					$this->prepareView("addondomainsdelete");
+					$this->prepareView("admin_addondomainsdelete");
 					$this->view->domain    = $this->getFromVars($_GET, 'domain');
 					$this->view->subdomain = $this->getFromVars($_GET, 'subdomain');
 					return $this->showCorrectView($this->view);
@@ -4394,7 +4481,7 @@ class cpanelextended extends Module {
 				break;
 		}
 		if($api->sendApi2Request("AddonDomain", "listaddondomains")->isSuccess()) {
-			$this->prepareView("addondomains");
+			$this->prepareView("admin_addondomains");
 			$this->view->username = $fields->cpanel_username;
 			$this->view->domains  = $api->getResponse();
 			return $this->view->fetch();
@@ -4414,8 +4501,9 @@ class cpanelextended extends Module {
 		$row        = $this->getModuleRow();
 		$fields     = $this->serviceFieldsToObject($service->fields);
 		$api        = $this->getApiByMeta($row->meta, $fields);
-		$this->vars = $this->getPageVars($vars);
-		switch($this->vars->action) {
+		$vars       = $this->getPageVars($vars);
+		$this->vars = $vars;
+		switch($vars->param1) {
 			case "create":
 				if($api->sendApi2Request("Park", "park", array(
 					'domain' => $post["domainname"]
@@ -4432,7 +4520,7 @@ class cpanelextended extends Module {
 						$this->printJson($this->parseResponseToJson($api->getCleanResponse()));
 					}
 				} else {
-					$this->prepareView("parkeddomainredirect");
+					$this->prepareView("admin_parkeddomainredirect");
 					$this->view->domain = $this->getFromVars($_GET, "domain");
 					return $this->showCorrectView($this->view);
 				}
@@ -4453,7 +4541,7 @@ class cpanelextended extends Module {
 						$this->printJson($this->parseResponseToJson($api->getCleanResponse()));
 					}
 				} else {
-					$this->prepareView("parkeddomaindelete");
+					$this->prepareView("admin_parkeddomaindelete");
 					$this->view->domain = $this->getFromVars($_GET, "domain");
 					return $this->showCorrectView($this->view);
 				}
@@ -4462,7 +4550,7 @@ class cpanelextended extends Module {
 				break;
 		}
 		if($api->sendApi2Request("Park", "listparkeddomains")->isSuccess()) {
-			$this->prepareView("parkeddomains");
+			$this->prepareView("admin_parkeddomains");
 			$this->view->domains  = $api->getResponse();
 			$this->view->username = $fields->cpanel_username;
 			return $this->view->fetch();
@@ -4482,8 +4570,9 @@ class cpanelextended extends Module {
 		$row        = $this->getModuleRow();
 		$fields     = $this->serviceFieldsToObject($service->fields);
 		$api        = $this->getApiByMeta($row->meta, $fields);
-		$this->vars = $this->getPageVars($vars);
-		switch($this->vars->action) {
+		$vars       = $this->getPageVars($vars);
+		$this->vars = $vars;
+		switch($vars->param1) {
 			case "create":
 				if(!empty($post)) {
 					if($api->sendApi2Request("Cron", "add_line", array(
@@ -4506,7 +4595,7 @@ class cpanelextended extends Module {
 						$this->printJson($this->parseResponseToJson($api->getCleanResponse()));
 					}
 				} else {
-					$this->prepareView("crondelete");
+					$this->prepareView("admin_crondelete");
 					$this->view->line = $this->getFromVars($_GET, "line");
 					return $this->showCorrectView($this->view);
 				}
@@ -4525,7 +4614,7 @@ class cpanelextended extends Module {
 						$this->printJson($this->parseResponseToJson($api->getCleanResponse()));
 					}
 				} else {
-					$this->prepareView("cronedit");
+					$this->prepareView("admin_cronedit");
 					$this->view->set("common_settings", $this->getCommonCronSettings());
 					$this->view->line = $this->getFromVars($_GET, "line");
 					$this->view->job  = @unserialize(base64_decode($this->getFromVars($_GET, "data")));
@@ -4545,7 +4634,7 @@ class cpanelextended extends Module {
 				break;
 		}
 		if($api->sendApi2Request("Cron", "listcron")->isSuccess()) {
-			$this->prepareView("cron");
+			$this->prepareView("admin_cron");
 			$this->view->set("common_settings", $this->getCommonCronSettings());
 			$this->view->jobs     = $api->getResponse();
 			$this->view->username = $fields->cpanel_username;
@@ -4553,126 +4642,6 @@ class cpanelextended extends Module {
 			return $this->view->fetch();
 		} else {
 			return $api->getResultMessage();
-		}
-	}
-	/**
-	 * Manage Blocked IP's
-	 *
-	 * @param type $package
-	 * @param type $service
-	 * @param array $vars
-	 *
-	 * @return string
-	 */
-	public function tabIpblocker($package, $service, array $get = null, array $post = null, array $files = null) {
-		if(isset($get[2])) {
-			if($get[2] === "addnew") {
-				if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-					$this->view = new View("backups", "default");
-					$this->view->setDefaultView("components" . DS . "modules" . DS . "cpanelextended" . DS);
-					$view_dir = str_replace('client/', '', $this->base_uri) . $this->view->view_path . 'views/' . $this->view->view . '/';
-					Loader::loadHelpers($this, array(
-						"Form",
-						"Html"
-					));
-					$fields = $this->serviceFieldsToObject($service->fields);
-					$row    = $this->getModuleRow();
-					$api    = $this->getApiByMeta($row->meta, $fields);
-					if(isset($post) && !empty($post)) {
-						if($post['ip'] !== "") {
-							Loader::loadModels($this, array(
-								"Services"
-							));
-							$add_new = $api->sendApi1Request("DenyIp", "adddenyip", $post);
-							$this->log($row->meta->host_name . "|Add New Denied IP", serialize("adddenyip"), "input", true);
-							if(isset($add_new->cpanelresult->error) && !empty($add_new->cpanelresult->error)) {
-								$error = array(
-									0 => array(
-										"result" => $add_new->cpanelresult->error
-									)
-								);
-								echo "<div class='alert alert-danger alert-dismissable'>
-												<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>
-												<p>{$error[0]['result']}</p>
-											</div>";
-							} else {
-								echo "<div class='alert alert-success alert-dismissable'>
-												<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>
-												<p>" . Language::_("Cpe.misc.success", true) . "</p>
-											</div>";
-							}
-						} else {
-							$error = array(
-								0 => array(
-									"result" => Language::_("Cpe.!error.api.internal", true)
-								)
-							);
-							echo "<div class='alert alert-danger alert-dismissable'>
-											<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>
-											<p>{$error[0]['result']}</p>
-										</div>";
-						}
-					} else {
-						$this->Form->create("", array(
-							'onsubmit' => 'return false',
-							'id' => 'addform',
-							'autocomplete' => "off"
-						));
-						echo " <script type='text/javascript' src='" . $view_dir . "javascript/main.js'></script>
-											<div class='modal-body'>
-											<div class='div_response'></div>";
-						echo '<div class="form-group">
-				   					<label>' . Language::_("Cpe.label.ipaddress", true) . '</label>
-				    				<input type="text" class="form-control" value="" id="ip" name="ip" placeholder="e.g: 192.168.0.1"></div>
-									</div>
-									<div class="modal-footer">
-										<button type="button" name="cancel" class="btn btn-default" data-dismiss="modal"><i class="fa fa-ban"></i> ' . Language::_("Cpe.label.close", true) . '</button>
-										<button type="button" class="btn btn-primary" name="add_new" id="addnewsubmit"><i class="fa fa-plus-circle"></i> ' . Language::_("Cpe.blockip", true) . '</button>
-									</div>
-									<script type="text/javascript">
-									    $(document).ready(function() {
-									        $("#addnewsubmit").click(function () {
-									    var form = $("#addform").serialize();
-									    doAjaxPost("' . $this->base_uri . "services/manage/" . $service->id . "/ipblocker/addnew/?" . '"+ form, form);
-									        });
-									    });
-									</script>';
-						$this->Form->end();
-					}
-					exit();
-				}
-			}
-		} else {
-			$this->view           = new View("ip_blocker", "default");
-			$this->view->base_uri = $this->base_uri;
-			Loader::loadHelpers($this, array(
-				"Form",
-				"Html"
-			));
-			$row    = $this->getModuleRow();
-			$fields = $this->serviceFieldsToObject($service->fields);
-			$api    = $this->getApiByMeta($row->meta, $fields);
-			if(isset($post['delete_denyip'])) {
-				if(!empty($post['ip'])) {
-					$delete_email = $api->sendApi1Request("DenyIp", "deldenyip", $post);
-					$this->log($row->meta->host_name . "|Delete Denied IP", serialize("deldenyip"), "input", true);
-				} else {
-					$error = array(
-						0 => array(
-							"result" => Language::_("tastycpanel.empty_invalid_values", true)
-						)
-					);
-					$this->Input->setErrors($error[0]);
-				}
-			}
-			$ipblocker_list = $api->sendApi2Request("DenyIp", "listdenyips")->getResponse();
-			$this->view->set("module_row", $row);
-			$this->view->set("service_fields", $fields);
-			$this->view->set("ipblocker_list", $ipblocker_list->cpanelresult->data);
-			$this->view->set("type", $package->meta->type);
-			$this->view->set("service_id", $service->id);
-			$this->view->setDefaultView("components" . DS . "modules" . DS . "cpanelextended" . DS);
-			return $customfiles . $this->view->fetch();
 		}
 	}
 	/**
@@ -4710,12 +4679,12 @@ class cpanelextended extends Module {
 			$this->log($row->meta->host_name . "|sendApi2Request", serialize($params), "input", true);
 			$response = $this->parseResponse($api->sendApi2Request("SSH", "importkey", $params));
 		}
-		$this->prepareView("ssh", compact("fields"));
+		$this->prepareView("admin_ssh", compact("fields"));
 		$this->view->hosts = $api->getResponse();
 		return $this->view->fetch();
 	}
 	/**
-	 * SSL
+	 * Manage SSL
 	 *
 	 * @param type $package
 	 * @param type $service
@@ -4729,8 +4698,9 @@ class cpanelextended extends Module {
 		$row        = $this->getModuleRow();
 		$fields     = $this->serviceFieldsToObject($service->fields);
 		$api        = $this->getApiByMeta($row->meta, $fields);
-		$this->vars = $this->getPageVars($vars);
-		switch($this->vars->action) {
+		$vars       = $this->getPageVars($vars);
+		$this->vars = $vars;
+		switch($vars->param1) {
 			case "generatecsr":
 				$data = array(
 					'city' => $post['city'],
@@ -4788,11 +4758,11 @@ class cpanelextended extends Module {
 				if($api->sendApi2Request("SSLInfo", "fetchinfo", array(
 					'domain' => $domain
 				))->isSuccess()) {
-					$this->prepareView("sslviewkey");
+					$this->prepareView("admin_sslviewkey");
 					$this->view->data = $api->getResponse()->cpanelresult->data[0];
 					return $this->showCorrectView($this->view);
 				} else {
-					$this->prepareView("sslerror");
+					$this->prepareView("admin_sslerror");
 					$this->view->response = $api->getResponse();
 					return $this->showCorrectView($this->view);
 				}
@@ -4802,7 +4772,7 @@ class cpanelextended extends Module {
 				if($api->sendApi2Request("SSLInfo", "fetchinfo", array(
 					'domain' => $domain
 				))->isSuccess()) {
-					$this->prepareView("sslviewcrt");
+					$this->prepareView("admin_sslviewcrt");
 					$this->view->data = $api->getResponse()->cpanelresult->data[0];
 					return $this->showCorrectView($this->view);
 				} else {
@@ -4826,7 +4796,7 @@ class cpanelextended extends Module {
 			$domains                         = array_merge($domains, $this->DataStructure->create("Array")->numericToKey($api2->sendApi2Request("Park", "listparkeddomains")->getResponse()->cpanelresult->data, 'domain', 'domain'));
 			$keysdomains['']                 = 'Select a domain';
 			$keysdomains                     = array_merge($keysdomains, $this->DataStructure->create("Array")->numericToKey($request1->getResponse()->cpanelresult->data, 'host', 'host'));
-			$this->prepareView("ssl");
+			$this->prepareView("admin_ssl");
 			$this->view->set("cpanel_domain", $fields->cpanel_domain);
 			$this->view->keys        = $request1->getResponse();
 			$this->view->crts        = $request2->getResponse();
@@ -4840,209 +4810,6 @@ class cpanelextended extends Module {
 			return $this->view->fetch();
 		} else {
 			return "Request 1 status: <code>{$request1->getResultMessage()}</code><br>Request 2 status: <code>{$request2->getResultMessage()}</code><br>Request 3 status: <code>{$request3->getResultMessage()}</code><br>";
-		}
-	}
-	/**
-	 * Install Apps in your Site with Softaculous
-	 *
-	 * @param type $package
-	 * @param type $service
-	 * @param array $vars
-	 * @param array $post
-	 */
-	public function tabManageapps($package, $service, array $get = null, array $post = null, array $files = null) {
-		if(isset($get[2])) {
-			if($get[2] === "installapps") {
-				if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-					$this->view = new View("manageapps_softaculous", "default");
-					$this->view->setDefaultView("components" . DS . "modules" . DS . "cpanelextended" . DS);
-					$view_dir = str_replace('client/', '', $this->base_uri) . $this->view->view_path . 'views/' . $this->view->view . '/';
-					Loader::loadHelpers($this, array(
-						"Form",
-						"Html"
-					));
-					$row    = $this->getModuleRow();
-					$fields = $this->serviceFieldsToObject($service->fields);
-					$api    = $this->getsoftaApi($package, $service, $row->meta->host_name, $fields->cpanel_username, $fields->cpanel_password);
-					if(isset($post) && !empty($post)) {
-						if($post['softdomain'] !== "" && $post['softdirectory'] !== "" && $post['admin_username'] !== "" && $post['admin_pass'] !== "" && $post['admin_email'] !== "" && $post['softdb'] !== "" && $post['dbusername'] !== "" && $post['dbuserpass'] !== "" && $post['language'] !== "" && $post['site_name'] !== "" && $post['site_desc'] !== "") {
-							Loader::loadModels($this, array(
-								"Services"
-							));
-							$install_script = $api->install($post['scriptid'], $post);
-							$res            = unserialize($install_script);
-							if(empty($res['error'])) {
-								echo "<div class='alert alert-success alert-dismissable'>
-												<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>
-												<p>" . Language::_("Cpe.misc.success", true) . "</p>
-											</div>";
-							} else {
-								foreach($res['error'] as $key => $value) {
-									echo "<div class='alert alert-danger alert-dismissable'>
-													<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>
-													<p>{$res['error'][$key]}</p>
-												</div>";
-								}
-							}
-						} else {
-							$error = array(
-								0 => array(
-									"result" => Language::_("Cpe.!error.api.internal", true)
-								)
-							);
-							echo "<div class='alert alert-danger alert-dismissable'>
-											<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>
-											<p>{$error[0]['result']}</p>
-										</div>";
-						}
-					} else {
-						$this->Form->create("", array(
-							'onsubmit' => 'return false',
-							'id' => 'addform',
-							'autocomplete' => "off"
-						));
-						echo "<script type='text/javascript' src='" . $view_dir . "javascript/main.js'></script>
-									<div class='modal-body'>
-									<div class='div_response'></div>";
-						echo '<div class="form-group">
-				   <label>' . Language::_("Cpe.softaculous.app", true) . '</label>
-				<select name="scriptid" id="scriptid" class="form-control">
-				' . $this->scriptsavailable($package, $service) . '
-				</select>
-				</div>
-				<div class="form-group">
-				   <label>' . Language::_("Cpe.label.domain", true) . '</label>
-				<select name="softdomain" id="softdomain" class="form-control">
-				' . $this->getAvailableDomains($package, $service) . '
-				</select>
-				</div>
-				<div class="form-group">
-				   <label>' . Language::_("Cpe.label.directory", true) . '</label>
-				    <input type="text" class="form-control" value="" id="softdirectory" name="softdirectory" placeholder=""></div>
-				<div class="form-group">
-				   <label>' . Language::_("Cpe.softaculous.admin_user", true) . '</label>
-				    <input type="text" class="form-control" value="" id="admin_username" name="admin_username" placeholder=""></div>
-				<div class="form-group">
-				   <label>' . Language::_("Cpe.softaculous.admin_pass", true) . '</label>
-				    <input type="password" class="form-control" value="" id="admin_pass" name="admin_pass" placeholder=""></div>
-				<div class="form-group">
-				   <label>' . Language::_("Cpe.softaculous.admin_email", true) . '</label>
-				    <input type="text" class="form-control" value="" id="admin_email" name="admin_email" placeholder=""></div>
-				<div class="form-group">
-				   <label>' . Language::_("Cpe.label.dbname", true) . '</label>
-				<div class="input-group">
-				  <span class="input-group-addon" id="dir_s">' . $fields->cpanel_username . '_</span>
-				    <input type="text" class="form-control" value="" id="softdb" name="softdb" placeholder=""></div>
-				</div>
-				<div class="form-group">
-				   <label>' . Language::_("Cpe.softaculous.database_user", true) . '</label>
-				<div class="input-group">
-				  <span class="input-group-addon" id="dir_s">' . $fields->cpanel_username . '_</span>
-				    <input type="text" class="form-control" value="" id="dbusername" name="dbusername" placeholder=""></div>
-				</div>
-				<div class="form-group">
-				   <label>' . Language::_("Cpe.softaculous.database_pass", true) . '</label>
-				    <input type="password" class="form-control" value="" id="dbuserpass" name="dbuserpass" placeholder=""></div>
-				<div class="form-group">
-				   <label>' . Language::_("Cpe.softaculous.site_name", true) . '</label>
-				    <input type="text" class="form-control" value="" id="site_name" name="site_name" placeholder=""></div>
-				<div class="form-group">
-				   <label>' . Language::_("Cpe.softaculous.site_desc", true) . '</label>
-				    <input type="text" class="form-control" value="" id="site_desc" name="site_desc" placeholder=""></div>
-				<div class="form-group">
-				   <label>' . Language::_("Cpe.softaculous.language", true) . '</label>
-				<select name="language" id="language" class="form-control">
-				<option value="en">English</option>
-				<option value="ar">Arabic</option>
-				<option value="bg_BG">Bulgarian</option>
-				<option value="ca">Catalan</option>
-				<option value="zh_CN">Chinese(Simplified)</option>
-				<option value="zh_TW">Chinese(Traditional)</option>
-				<option value="hr">Croatian</option>
-				<option value="cs_CZ">Czech</option>
-				<option value="da_DK">Danish</option>
-				<option value="nl_NL">Dutch</option>
-				<option value="fi">Finnish</option>
-				<option value="fr_FR">French</option>
-				<option value="de_DE">German</option>
-				<option value="el">Greek</option>
-				<option value="he_IL">Hebrew</option>
-				<option value="hu_HU">Hungarian</option>
-				<option value="id_ID">Indonesian</option>
-				<option value="it_IT">Italian</option>
-				<option value="ja">Japanese</option>
-				<option value="ko_KR">Korean</option>
-				<option value="nb_NO">Norwegian</option>
-				<option value="fa_IR">Persian</option>
-				<option value="pl_PL">Polish</option>
-				<option value="pt_PT">Portuguese</option>
-				<option value="pt_BR">Portuguese-BR</option>
-				<option value="ro_RO">Romanian</option>
-				<option value="ru_RU">Russian</option>
-				<option value="sl_SI">Slovenian</option>
-				<option value="es_ES">Spanish</option>
-				<option value="sv_SE">Swedish</option>
-				<option value="th">Thai</option>
-				<option value="tr_TR">Turkish</option>
-				<option value="uk">Ukrainian</option>
-				</select>
-				</div>
-
-				</div>
-				<div class="modal-footer">
-				<button type="button" name="cancel" class="btn btn-default" data-dismiss="modal"><i class="fa fa-ban"></i> ' . Language::_("Cpe.label.close", true) . '</button>
-				<button type="button" class="btn btn-primary" name="add_new" id="addnewsubmit"><i class="fa fa-plus-circle"></i> ' . Language::_("Cpe.softaculous.install", true) . '</button>
-				</div>
-				<script type="text/javascript">
-				    $(document).ready(function() {
-				        $("#addnewsubmit").click(function () {
-				    var form = $("#addform").serialize();
-				    doAjaxPost("' . $this->base_uri . "services/manage/" . $service->id . "/manageapps/installapps/?" . '"+ form, form);
-				        });
-				    });
-				</script>';
-						$this->Form->end();
-					}
-					exit();
-				}
-			}
-		} else {
-			$this->view           = new View("manageapps_softaculous", "default");
-			$this->view->base_uri = $this->base_uri;
-			Loader::loadHelpers($this, array(
-				"Form",
-				"Html"
-			));
-			$row    = $this->getModuleRow();
-			$fields = $this->serviceFieldsToObject($service->fields);
-			$api    = $this->getsoftaApi($package, $service, $row->meta->host_name, $fields->cpanel_username, $fields->cpanel_password);
-			if(isset($post['submitremovebu'])) {
-				$remove_backup = $api->remove_backup($post['filename']);
-			} else if(isset($post['submitmakebu'])) {
-				$make_backup = $api->backup($post['installid']);
-			} else if(isset($post['submitrestorebu'])) {
-				$restore = $api->restore($post['filename']);
-			} else if(isset($post['submitdeleteinstall'])) {
-				$remove = $api->remove($post['installid']);
-			} else if(isset($post['submitupgrade'])) {
-				$upgrade = $api->upgrade($post['installid']);
-			}
-			$getallscripts  = $api->list_scripts();
-			$result_backups = $api->list_backups();
-			$installations  = $api->installations();
-			$this->view->set("result_backups", $result_backups);
-			$this->view->set("availabledomain", $this->getAvailableDomains($package, $service));
-			$this->view->set("availablescripts", $this->scriptsavailable($package, $service));
-			$this->view->set("user_type", $package->meta->type);
-			$this->view->set("module_row", $row);
-			$this->view->set("service_fields", $fields);
-			$this->view->set("installations", $installations);
-			$this->view->set("listscripts", $api->scripts);
-			$this->view->set("cpdomain", $fields->domain_name);
-			$this->view->set("cpusername", $fields->username);
-			$this->view->set("service_id", $service->id);
-			$this->view->setDefaultView("components" . DS . "modules" . DS . "cpanelextended" . DS);
-			return $customfiles . $this->view->fetch();
 		}
 	}
 	/**
@@ -5085,7 +4852,7 @@ class cpanelextended extends Module {
 		$response = substr($response, (strpos($response, "[response:protected] =>") + 23), strlen($response));
 		$response = substr($response, 0, strpos($response, "[statusmsg:protected]"));
 		$response = json_decode($response, true);
-		$this->prepareView("webdisk");
+		$this->prepareView("admin_webdisk");
 		$this->view->set("res", $res);
 		$this->view->set("response", $response);
 		$this->view->set("response_del", $response_del);
@@ -5097,168 +4864,6 @@ class cpanelextended extends Module {
 		$this->view->fields    = $fields;
 		$this->view->cpanelurl = $api->buildUrl();
 		return $this->view->fetch();
-	}
-	/**
-	 * Allow you to manage and create your backups.
-	 *
-	 * @param type $package
-	 * @param type $service
-	 * @param array $vars
-	 * @param array $post
-	 */
-	public function tabBackups($package, $service, array $get = null, array $post = null, array $files = null) {
-		if(isset($get[2])) {
-			if($get[2] === "addnew") {
-				if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-					$this->view = new View("backups", "default");
-					$this->view->setDefaultView("components" . DS . "modules" . DS . "cpanelextended" . DS);
-					$view_dir = str_replace('client/', '', $this->base_uri) . $this->view->view_path . 'views/' . $this->view->view . '/';
-					Loader::loadHelpers($this, array(
-						"Form",
-						"Html"
-					));
-					$fields = $this->serviceFieldsToObject($service->fields);
-					$row    = $this->getModuleRow();
-					$api    = $this->getApiByMeta($row->meta, $fields);
-					if(isset($post) && !empty($post)) {
-						if($post['dest'] !== "") {
-							$input = array(
-								"dest" => $post['dest'],
-								"server" => $post['server'],
-								"user" => $post['user'],
-								"pass" => $post['pass'],
-								"email" => $post['email'],
-								"port" => $post['port'],
-								"rdir" => $post['rdir']
-							);
-							if($post['dest'] !== "homedir") {
-								if($post['server'] !== "" && $post['user'] !== "" && $post['pass'] !== "" && $post['port'] !== "" && $post['rdir'] !== "") {
-									Loader::loadModels($this, array(
-										"Services"
-									));
-									$add_new = $api->sendApi1Request("Fileman", "fullbackup", $input);
-									$this->log($row->meta->host_name . "|Generate New Backup", serialize("fullbackup"), "input", true);
-									echo "<div class='alert alert-success alert-dismissable' style='margin-top: 0px;'>
-																						<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>
-																						<p>" . Language::_("Cpe.misc.success", true) . "</p>
-																					</div>";
-								} else {
-									$error = array(
-										0 => array(
-											"result" => Language::_("Cpe.!error.api.internal", true)
-										)
-									);
-									echo "<div class='alert alert-danger alert-dismissable' style='margin-top: 0px;'>
-																											<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>
-																											<p>{$error[0]['result']}</p>
-																											</div>";
-								}
-							} else {
-								Loader::loadModels($this, array(
-									"Services"
-								));
-								$add_new = $api->sendApi1Request("Fileman", "fullbackup", $input);
-								$this->log($row->meta->host_name . "|Generate New Backup", serialize("fullbackup"), "input", true);
-								echo "<div class='alert alert-success alert-dismissable' style='margin-top: 0px;'>
-																					<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>
-																					<p>" . Language::_("Cpe.misc.success", true) . "</p>
-																					</div>";
-							}
-						} else {
-							$error = array(
-								0 => array(
-									"result" => Language::_("Cpe.!error.api.internal", true)
-								)
-							);
-							echo "<div class='alert alert-danger alert-dismissable' style='margin-top: 0px;'>
-																						<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>
-																						<p>{$error[0]['result']}</p>
-																					</div>";
-						}
-					} else {
-						$this->Form->create("", array(
-							'onsubmit' => 'return false',
-							'id' => 'addform',
-							'autocomplete' => "off"
-						));
-						echo "
-								<script type='text/javascript' src='" . $view_dir . "javascript/main.js'></script>
-								<div class='modal-body'>
-								<div class='div_response'></div>";
-						echo '<div class="form-group">
-								   <label>' . Language::_("Cpe.label.email", true) . '</label>
-								    <input type="email" class="form-control" value="" id="email" name="email" placeholder=""></div>
-								<div class="form-group">
-								   <label>' . Language::_("Cpe.label.destination", true) . '</label>
-								<select name="dest" id="dest" class="form-control">
-								                <option value="homedir" selected="selected">Home Directory</option>
-								                <option value="ftp">Remote FTP Server</option>
-								                <option value="passiveftp">Remote FTP Server (passive mode transfer):</option>
-								                <option value="scp">Secure Copy (SCP)</option>
-								</select>
-								</div>
-								<div id="access_data" style="display:none;">
-								<div class="form-group">
-								   <label>' . Language::_("Cpe.service_info.server", true) . '</label>
-								    <input type="text" class="form-control" value="" id="server" name="server" placeholder=""></div>
-								<div class="form-group">
-								   <label>' . Language::_("Cpe.label.username", true) . '</label>
-								    <input type="text" class="form-control" value="" id="user" name="user" placeholder=""></div>
-								<div class="form-group">
-								   <label>' . Language::_("Cpe.label.password", true) . '</label>
-								    <input type="password" class="form-control" value="" id="pass" name="pass" placeholder=""></div>
-								<div class="form-group">
-								   <label>' . Language::_("Cpe.label.port", true) . '</label>
-								    <input type="text" class="form-control" value="" id="port" name="port" placeholder=""></div>
-								<div class="form-group">
-								   <label>' . Language::_("Cpe.label.directory", true) . '</label>
-								    <input type="text" class="form-control" value="" id="rdir" name="rdir" placeholder=""></div>
-								</div>
-								</div>
-								<div class="modal-footer">
-								<button type="button" name="cancel" class="btn btn-default" data-dismiss="modal"><i class="fa fa-ban"></i> ' . Language::_("Cpe.label.close", true) . '</button>
-								<button type="button" class="btn btn-primary" name="add_new" id="addnewsubmit"><i class="fa fa-plus-circle"></i> ' . Language::_("Cpe.label.generate_backup", true) . '</button>
-								</div>
-
-								<script type="text/javascript">
-								    $(document).ready(function() {
-								        $("#addnewsubmit").click(function () {
-								    var form = $("#addform").serialize();
-								    doAjaxPost("' . $this->base_uri . "services/manage/" . $service->id . "/backups/addnew/?" . '"+ form, form);
-								        });
-								        $("#dest").change(function () {
-								        if($(this).val() !== "homedir"){
-								    $("#access_data").css("display","block");
-								    } else {
-								    $("#access_data").css("display","none");
-								    }
-								        });
-								    });
-								</script>';
-						$this->Form->end();
-					}
-					exit();
-				}
-			}
-		} else {
-			$this->view           = new View("backups", "default");
-			$this->view->base_uri = $this->base_uri;
-			Loader::loadHelpers($this, array(
-				"Form",
-				"Html"
-			));
-			$fields       = $this->serviceFieldsToObject($service->fields);
-			$row          = $this->getModuleRow();
-			$api          = $this->getApiByMeta($row->meta, $fields);
-			$backups_list = $api->sendApi2Request("Backups", "listfullbackups")->getResponse();
-			$this->view->set("module_row", $row);
-			$this->view->set("service_fields", $fields);
-			$this->view->set("backups_list", $backups_list->cpanelresult->data);
-			$this->view->set("type", $package->meta->type);
-			$this->view->set("service_id", $service->id);
-			$this->view->setDefaultView("components" . DS . "modules" . DS . "cpanelextended" . DS);
-			return $this->view->fetch();
-		}
 	}
 	/**
 	 * Allow you to login to one of the services: cPanel, phpMyAdmin, webMail
@@ -5273,11 +4878,20 @@ class cpanelextended extends Module {
 		$fields     = $this->serviceFieldsToObject($service->fields);
 		$api        = $this->getApiByMeta($row->meta, $fields);
 		$this->vars = $this->getPageVars($vars);
-		$this->prepareView("loginto");
+		// Array with SSO links
+		$sso = array(
+			'cpanel' => $this->sso($fields->cpanel_username),
+			'phpmyadmin' => $this->sso($fields->cpanel_username, 'Database_phpMyAdmin'),
+			'filemanager' => $this->sso($fields->cpanel_username, 'FileManager_Home'),
+			'webmail' => $this->sso($fields->cpanel_username, null, 'webmaild'),
+			'whm' => $this->sso($fields->cpanel_username, null, 'whostmgrd')
+		);
+		$this->prepareView("admin_loginto");
 		$this->view->server    = $row;
 		$this->view->fields    = $fields;
 		$this->view->cpanelurl = $api->buildUrl();
 		$this->view->set("package", $package);
+		$this->view->set("sso", $sso);
 		return $this->view->fetch();
 	}
 	/**
@@ -5489,28 +5103,47 @@ class cpanelextended extends Module {
 		return $result;
 	}
 	/**
-	 * Update Check
+	 * Generates a one time login link to one of the services: cPanel, Webmail and File Manager
 	 *
-	 * @return array Retuns the download link if a update is available.
+	 * @param string $username The cPanel account username
+	 * @param string $service The cPanel service to generate session
+	 * @param string $app Redirect to app (Optional)
+	 * @return string The single sign on URL
 	 */
-	public function updateCheck() {
-		$post = array(
-			'version' => self::$version,
-			'prefix' => 'cpanelextended'
+	public function sso($username, $app=null, $service='cpaneld') {
+		$row        = $this->getModuleRow();
+		$api        = $this->getApiByMeta($row->meta, $fields);
+		// Genereate SSO Session
+		$params = array(
+			'user' => $username,
+			'service' => $service,
+            'app' => $app
 		);
-		$ch   = curl_init();
-		curl_setopt($ch, CURLOPT_URL, 'https://modulematic.ml/check/update/');
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_TIMEOUT, 20);
-		curl_setopt($ch, CURLOPT_FRESH_CONNECT, 1);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-		curl_setopt($ch, CURLOPT_HEADER, 0);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-		$data = json_decode(curl_exec($ch), true);
-		curl_close($ch);
-		return $data;
+		$result = $api->create_user_session($params, 1);
+		$result = $this->parseResponse($result->getCleanResponse());
+        return $result->data->url;
+    }
+	/**
+	 * Generates a screenshot of a website
+	 *
+	 * @param string $domain The website domain
+	 * @param string $api_key The page2image api key
+	 * @return string The image URL
+	 */
+	public function screenshot($domain, $api_key) {
+		$curl = curl_init();
+		curl_setopt($curl, CURLOPT_URL, 'https://api.page2images.com/restfullink?p2i_url=http://'.$domain.'&p2i_key='.$api_key);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+		curl_setopt($curl, CURLOPT_HEADER, 0);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+		$result = curl_exec($curl);
+		curl_close($curl);
+		// Parse Response 
+		$response = json_decode($result, true);
+		if($response['status'] == 'finished'){
+			return $response['image_url'];
+		}
 	}
 }
 ?>

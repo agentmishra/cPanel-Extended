@@ -19,20 +19,8 @@
 	echo $this->commonHeader;
 ?>
 
-				<link rel="stylesheet" href="<?php echo $this->view_dir;?>css/gauge.min-v2.0.0.css">
-				<script src="<?php echo $this->view_dir;?>javascript/gauge.min.js"></script>
-
-          <?php
-          	global $img_url;
-            $api_key = 'decd546b9159161f';
-						$f = json_decode(file_get_contents('https://api.page2images.com/restfullink?p2i_url=http://'.$this->stats->account_info->acct[0]->domain.'&p2i_key='.$api_key), true);
-						if($f['status'] == 'finished'){
-							$img_url = str_replace("http:","https:", $f['image_url']);
-						} else {
-							$img_url = str_replace('client/', "", $this->view_dir.'images/not-available.jpg');
-						}
-					?>
-
+			<link rel="stylesheet" href="<?php echo $this->view_dir;?>css/gauge.min-v2.0.0.css">
+			<script src="<?php echo $this->view_dir;?>javascript/gauge.min.js"></script>
 			<div class="row">
 				<div class="col-md-12 col-lg-7">
 					<center><h5><?php $this->_("Cpe.tab_client_stats.usage_title");?></h5></center>
@@ -63,7 +51,11 @@
 				</div>
 				<div class="col-lg-5 hidden-md hidden-sm hidden-xs">
 					<center><h5><?php $this->_("Cpe.titles.preview");?></h5></center>
-					<img class="img-responsive" src="<?= $img_url; ?>">
+					<?php if(!empty($image_url)){ ?>
+					<img class="img-responsive" src="<?php echo $this->Html->safe($image_url); ?>">
+					<?php } else { ?>
+					<div style="background: #f4f4f4; width: 100%; height: 200px;"></div>
+					<?php } ?>
 				</div>
 			</div>
 		</div>

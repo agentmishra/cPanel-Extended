@@ -5,7 +5,6 @@
 
 // Basics
 $lang['Cpe.name'] = "cPanel Extended";
-$lang['Cpe.update_available'] = "AVAILABLE UPDATE";
 $lang['Cpe.module_row'] = "Server";
 $lang['Cpe.module_row_plural'] = "Servers";
 $lang['Cpe.module_group'] = "Server Group";
@@ -180,6 +179,7 @@ $lang['Cpe.button.deletesubdomain'] = "Delete Subdomain";
 $lang['Cpe.button.deleteparked'] = "Delete Parked Domain";
 
 // Labels
+$lang['Cpe.label.suspension_reason'] = "Suspension Reason";
 $lang['Cpe.label.files'] = "Files";
 $lang['Cpe.label.filemanager'] = "File Manager";
 $lang['Cpe.label.advanced'] = "Advanced";
@@ -274,6 +274,7 @@ $lang['Cpe.label.port'] = "Port";
 $lang['Cpe.label.add_new'] = "Add New";
 $lang['Cpe.label.enable'] = "Enable";
 $lang['Cpe.label.disable'] = "Disable";
+$lang['Cpe.label.domainfield'] = "Detect Domain Automatically (If is detected, field will be hidden)";
 $lang['Cpe.label.usernamefield'] = "Username Field";
 $lang['Cpe.label.passwordfield'] = "Password Field";
 $lang['Cpe.label.diskreseller'] = "Disk Space Reseller Limit";
@@ -282,6 +283,7 @@ $lang['Cpe.label.bandreseller'] = "Bandwidth Reseller Limit";
 // Tooltip
 $lang['Cpe.tooltip.quota'] = "Provide a quota in megabytes, 0 means unlimited";
 $lang['Cpe.tooltip.bandwidth'] = "Enter an monthly bandwidth limit in megabytes, 0 means unlimited";
+$lang['Cpe.tooltip.suspension_reason'] = "Fill only if you are suspending a service, client can see the reason.";
 
 // Cron specified
 $lang['Cpe.cron.commonsettings'] = "-- Common Settings --";
@@ -416,6 +418,7 @@ $lang['Cpe.add_row.box_title'] = "Add cPanel Server";
 $lang['Cpe.add_row.basic_title'] = "Basic Settings";
 $lang['Cpe.add_row.name_servers_title'] = "Name Servers";
 $lang['Cpe.add_row.notes_title'] = "Notes";
+$lang['Cpe.add_row.pagetoimage_title'] = "Page2Image API";
 $lang['Cpe.add_row.name_server_btn'] = "Add Additional Name Server";
 $lang['Cpe.add_row.name_server_col'] = "Name Server";
 $lang['Cpe.add_row.name_server_host_col'] = "Hostname";
@@ -439,6 +442,7 @@ $lang['Cpe.row_meta.host_name'] = "Hostname";
 $lang['Cpe.row_meta.user_name'] = "User Name";
 $lang['Cpe.row_meta.key'] = "Remote Key";
 $lang['Cpe.row_meta.password'] = "Password";
+$lang['Cpe.row_meta.pagetoimage_key'] = "API Key";
 $lang['Cpe.row_meta.use_ssl'] = "Use SSL when connecting to the API (recommended)";
 $lang['Cpe.row_meta.account_limit'] = "Account Limit";
 

@@ -1,0 +1,103 @@
+<?php
+//  CyanDark Incorporated
+//  Copyright (c) 2012-2016 CyanDark, Inc. All Rights Reserved.
+//
+//  This software is furnished under a license and may be used and copied
+//  only  in  accordance  with  the  terms  of such  license and with the
+//  inclusion of the above copyright notice.  This software  or any other
+//  copies thereof may not be provided or otherwise made available to any
+//  other person.  No title to and  ownership of the  software is  hereby
+//  transferred.
+//
+//  You may not reverse  engineer, decompile, defeat  license  encryption
+//  mechanisms, or  disassemble this software product or software product
+//  license. CyanDark may terminate this license if you don't comply with
+//  any of the  terms  and conditions  set  forth in our end user license
+//  agreement (EULA).  In such event, licensee  agrees to return licensor
+//  or  destroy all copies  of  software  upon termination of the license
+?>
+<div class="title_row first">
+	<h3><?php $this->_('Cpe.webdisk.add'); ?></h3>
+</div>
+<div class="pad">
+	<?php $this->Form->create('create'); ?>
+		<ul>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.th.domain', true), 'domain');
+				$this->Form->fieldText('domain', $this->Html->ifSet($this->post['domain']), array('id' => 'domain', 'class' => "form-control", 'value' => $fields->cpanel_domain));
+				?>
+			</li>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.username', true), 'user');
+				$this->Form->fieldText('user', $this->Html->ifSet($this->post['user']), array('id' => 'user', 'class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.password', true), 'password');
+				$this->Form->fieldPassword('password', array('id' => 'password', 'class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.directory', true), 'homedir'); ?>
+				<code>/home/<?php $this->Html->_($this->fields->cpanel_username); ?>/public_html/</code>
+				<?php
+				$this->Form->fieldText('homedir', $this->Html->ifSet($this->post['homedir']), array('id' => 'homedir', 'class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php $this->Form->label($this->_('Cpe.webdisk.perms', true), 'perms'); ?>
+				<select name="perms" class="form-control">
+				  	<option value="rw">Read-Write</option>
+				  	<option value="ro">Read</option>
+				</select>
+			</li>
+		</ul>
+		<div class="button_row">
+			<a class="btn_right submit" href="#"><?php $this->_('Cpe.button.createaccount'); ?></a>
+		</div>
+	<?php $this->Form->end(); ?>
+</div>
+
+<div class="title_row">
+	<h3><?php $this->_('Cpe.manage.module_rows_heading.accounts'); ?></h3>
+</div>
+<div class="pad">
+	<?php if(isset($_GET['delete'])){ ?>
+		<?php if(preg_match("/success/i", $response_del)){ ?>
+			<strong style="color: #008000;"><?php $this->_('Cpe.misc.success'); ?></strong>
+		<?php } else { ?>
+			<strong style="color: #800000;"><?php $this->_('Cpe.!error.api.internal'); ?></strong>
+		<?php } ?>
+	<?php } ?>
+	
+	<table class="table">
+		<thead>
+			<tr class="heading_row">
+            	<td><?php $this->_('Cpe.th.username'); ?></td>
+            	<td><?php $this->_('Cpe.th.domain'); ?></td>
+            	<td><?php $this->_('Cpe.label.port'); ?></td>
+            	<td><?php $this->_('Cpe.th.path'); ?></td>
+            	<td><?php $this->_('Cpe.webdisk.perms'); ?></td>
+            	<td><?php $this->_('Cpe.th.options'); ?></td>
+			</tr>
+		</thead>
+		<tbody>
+		<?php $i = 1; ?>
+		<?php foreach($response['cpanelresult']['data'] as $account){ ?>
+			<tr <?php if($i % 2 == 0){ ?>class="odd_row"<?php } ?>>
+                <td><?= $account['user']; ?></td>
+                <td><?= $account['domain']; ?></td>
+                <td><?= $account['mainport']; ?></td>
+                <td><?= $account['homedir']; ?></td>
+                <td><?= $account['perms']; ?></td>
+                <td><a href="?delete=<?= base64_encode($account['user'].'@'.$account['domain']); ?>"><?php $this->_('Cpe.add_row.remove_name_server'); ?></a></td>
+			</tr>
+			<?php $i++; ?>
+		<?php } ?>
+		</tbody>
+	</table>
+</div>

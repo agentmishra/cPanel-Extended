@@ -33,9 +33,13 @@
 				<label for="username"><?= Language::_("Cpe.label.pointsto", true); ?></label>
 				<input type="text" name="fwdemail" value="" id="fwdemail" class="form-control">
 			</div>
-		<button class="btn btn-default pull-right">
-			<i class="fa fa-share"></i> <?= Language::_("Cpe.button.save", true); ?>
-		</button>
+			<div class="pull-right">
+				<div class="form-group">
+					<button class="btn btn-default">
+						<i class="fa fa-share"></i> <?= Language::_("Cpe.button.save", true); ?>
+					</button>
+				</div>
+			</div>
 	</div>
 	<?php $this->Form->end(); ?>
 
@@ -78,8 +82,12 @@
 				<label for="username"><?= Language::_("Cpe.label.pointsto", true); ?></label>
 				<input type="text" name="emaildest" value="" id="emaildest" class="form-control">
 			</div>
-		<button class="btn btn-default pull-right">
-			<i class="fa fa-share"></i> <?= Language::_("Cpe.emailforwarder.delete", true); ?>
-		</button>
+			<div class="pull-right">
+				<div class="form-group">
+					<button class="btn btn-default">
+						<i class="fa fa-share"></i> <?= Language::_("Cpe.emailforwarder.delete", true); ?>
+					</button>
+				</div>
+			</div>
 	</div>
 	<?php $this->Form->end(); ?>

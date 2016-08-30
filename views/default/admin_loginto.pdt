@@ -1,0 +1,60 @@
+<?php
+//  CyanDark Incorporated
+//  Copyright (c) 2012-2016 CyanDark, Inc. All Rights Reserved.
+//
+//  This software is furnished under a license and may be used and copied
+//  only  in  accordance  with  the  terms  of such  license and with the
+//  inclusion of the above copyright notice.  This software  or any other
+//  copies thereof may not be provided or otherwise made available to any
+//  other person.  No title to and  ownership of the  software is  hereby
+//  transferred.
+//
+//  You may not reverse  engineer, decompile, defeat  license  encryption
+//  mechanisms, or  disassemble this software product or software product
+//  license. CyanDark may terminate this license if you don't comply with
+//  any of the  terms  and conditions  set  forth in our end user license
+//  agreement (EULA).  In such event, licensee  agrees to return licensor
+//  or  destroy all copies  of  software  upon termination of the license
+?>
+<div class="title_row first">
+	<h3><?php $this->_('Cpe.titles.loginto'); ?></h3>
+</div>
+<div class="pad">
+	<ul>
+		<li>
+			<form method="post" action="<?php echo $this->Html->safe($sso['cpanel']); ?>" target="_blank">
+				<button class="btn-block" type="submit">cPanel</button>
+			</form>
+		</li>
+		<?php if($package->meta->databases == 'true' || $package->meta->remotedatabase == 'true'){ ?>
+		<li>
+			<form method="post" action="<?php echo $this->Html->safe($sso['phpmyadmin']); ?>" target="_blank">
+				<button class="btn-block" type="submit">phpMyAdmin</button>
+			</form>
+		</li>
+		<?php } ?>
+		<?php if($package->meta->emails == 'true' || $package->meta->emailforwarder == 'true'){ ?>
+		<li>
+			<form method="post" action="<?php echo $this->Html->safe($sso['webmail']); ?>" target="_blank">
+				<button class="btn-block" type="submit">Webmail</button>
+			</form>
+		</li>
+		<?php } ?>
+		<?php if($package->meta->ftpaccounts == 'true' || $package->meta->webdisk == 'true' || $package->meta->backups == 'true'){ ?>
+		<li>
+			<form method="post" action="<?php echo $this->Html->safe($sso['filemanager']); ?>" target="_blank">
+				<button class="btn-block" type="submit">File Manager</button>
+			</form>
+		</li>
+		<?php } ?>
+		<?php if($this->vars['package']->meta->type == 'reseller'){ ?>
+		<li>
+			<form method="post" action="<?php echo $this->Html->safe($sso['whm']); ?>" target="_blank">
+				<button class="btn-block" type="submit">Web Host Manager</button>
+			</form>
+		</li>
+		<?php } ?>
+	</ul>
+</div>
+
+<?php echo $this->jsScripts; ?>

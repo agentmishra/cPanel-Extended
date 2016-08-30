@@ -1,0 +1,108 @@
+<?php
+//  CyanDark Incorporated
+//  Copyright (c) 2012-2016 CyanDark, Inc. All Rights Reserved.
+//
+//  This software is furnished under a license and may be used and copied
+//  only  in  accordance  with  the  terms  of such  license and with the
+//  inclusion of the above copyright notice.  This software  or any other
+//  copies thereof may not be provided or otherwise made available to any
+//  other person.  No title to and  ownership of the  software is  hereby
+//  transferred.
+//
+//  You may not reverse  engineer, decompile, defeat  license  encryption
+//  mechanisms, or  disassemble this software product or software product
+//  license. CyanDark may terminate this license if you don't comply with
+//  any of the  terms  and conditions  set  forth in our end user license
+//  agreement (EULA).  In such event, licensee  agrees to return licensor
+//  or  destroy all copies  of  software  upon termination of the license
+?>
+
+<div class="title_row first">
+	<h3><?php $this->_("Cpe.subtitles.email.create");?></h3>
+</div>
+<div class="pad">
+	<div class="errorscontainer marbot10 martop10"></div>
+	<?php $this->Form->create('create', array('id' => 'createEmailAccount')); ?>
+		<ul>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.username', true), 'emailusername');
+				$this->Form->fieldText('emailusername', $this->Html->ifSet($this->post['emailusername']), array('id' => 'emailUsername', 'class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.domain', true), 'emaildomain');
+				$this->Form->fieldSelect('emaildomain', array_combine(array_values($this->domains), $this->domains), $this->Html->ifSet($this->post['emaildomain']), array('id' => 'emailDomain', 'class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php $this->Form->label($this->_('Cpe.label.password', true), 'emailpassword');?>
+				<button type="button" class="generatePassword" data-field1="emailpassword" data-field2="emailpasswordconfirm"><i class="fa fa-lock"></i> <?php echo $this->_('Cpe.button.generatepassword'); ?></button>
+				<?php $this->Form->fieldPassword('emailpassword', array('id' => 'emailpassword', 'style' => 'float: left;', 'class' => "form-control"));?>
+				<div id="generatedPassword" style="display: none;"><?php $this->_('Cpe.misc.genpasswordtext'); ?> <strong></strong></div>
+				<div class="clearfix"></div>
+			</li>
+			<li>
+				<?php
+                $this->Form->label($this->_('Cpe.label.passwordconfirm', true), 'emailpasswordconfirm');
+                $this->Form->fieldPassword('emailpasswordconfirm', array('id' => 'emailpasswordconfirm', 'class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php
+                $this->Form->label($this->_('Cpe.label.quota', true) . " " . $this->_('Cpe.misc.quotahint', true), 'emailquota');
+                $this->Form->fieldText('emailquota', $this->Html->ifSet($this->post['emailquota'], 0), array('id' => 'emailQuota', 'class' => "form-control", 'style' => "width:50px;"));
+				?>
+			</li>
+		</ul>
+		<div class="button_row">
+			<a class="btn_right submit" href="#"><?php $this->_('Cpe.button.createaccount'); ?></a>
+		</div>
+	<?php $this->Form->end(); ?>
+</div>
+
+
+<div class="title_row">
+	<h3><?php $this->_("Cpe.subtitles.email.list");?></h3>
+</div>
+<div class="pad">
+	<table class="table">
+		<thead>
+			<tr class="heading_row">
+				<td><span><?php $this->_("Cpe.th.login");?></span></td>
+				<td><span><?php $this->_("Cpe.th.quota");?></span></td>
+				<td><span><?php $this->_("Cpe.th.diskusage");?></span></td>
+				<td><span><?php $this->_("Cpe.th.actions");?></span></td>
+			</tr>
+		</thead>
+		<tbody>
+		<?php $i = 1; ?>
+		<?php foreach($this->accounts->cpanelresult->data as $i => $account){ ?>
+			<tr <?php if($i % 2 == 0){ ?>class="odd_row"<?php } ?>>
+            	<td style="width: 360px;"><?php $this->Html->_($account->login); ?></td>
+            	<td><?php echo is_numeric($account->diskquota) ? sprintf('%s MB', $account->diskquota) : $account->diskquota; ?></td>
+            	<td>
+                	<?php echo sprintf('%s%%', $account->diskusedpercent); ?>
+                	<div style="padding: 0px; margin: 5px 0; border: 1px solid black; width: 70px; height: 10px;">
+                    	<div style="height: 10px; width: <?php echo $account->diskusedpercent; ?>%; background-color: green;"></div>
+               		</div>
+               	</td>
+               	<td style="width: 320px;">
+                   <div class="btn-group">
+                   		<a href="<?php echo $this->Html->safe('changequota/?currentQuota='.$account->diskquota.'&username='.$account->login);?>" class="cpanelExtendedAjaxRequest"><?php $this->_('Cpe.button.changequota'); ?></a>
+                   		<a href="<?php echo $this->Html->safe('changepassword/?username='.$account->login);?>" class="cpanelExtendedAjaxRequest"><?php $this->_('Cpe.button.changepassword'); ?></a>
+                   		<a href="<?php echo $this->Html->safe('delete/?username='.$account->login);?>" class="cpanelExtendedAjaxRequest"><?php $this->_('Cpe.button.delete'); ?></a>
+                   </div>
+               </td>
+			</tr>
+            <tr class="expand_details modifyData" style="display: none;">
+            	<td class="subtable" colspan="5"></td>
+            </tr>
+			<?php $i++; ?>
+		<?php } ?>
+		</tbody>
+	</table>
+</div>
+
+<?php echo $this->jsScripts; ?>

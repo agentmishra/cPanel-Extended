@@ -1,0 +1,150 @@
+<?php
+//  CyanDark Incorporated
+//  Copyright (c) 2012-2016 CyanDark, Inc. All Rights Reserved.
+//
+//  This software is furnished under a license and may be used and copied
+//  only  in  accordance  with  the  terms  of such  license and with the
+//  inclusion of the above copyright notice.  This software  or any other
+//  copies thereof may not be provided or otherwise made available to any
+//  other person.  No title to and  ownership of the  software is  hereby
+//  transferred.
+//
+//  You may not reverse  engineer, decompile, defeat  license  encryption
+//  mechanisms, or  disassemble this software product or software product
+//  license. CyanDark may terminate this license if you don't comply with
+//  any of the  terms  and conditions  set  forth in our end user license
+//  agreement (EULA).  In such event, licensee  agrees to return licensor
+//  or  destroy all copies  of  software  upon termination of the license
+
+?>
+<div class="title_row first">
+	<h3><?php $this->_('Cpe.titles.cron'); ?></h3>
+</div>
+<div class="pad">
+	<?php $this->Form->create('create', array('id' => 'createCronJob')); ?>
+		<div class="errorscontainer marbot10 martop10"></div>
+		<ul>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.commonsettings', true), 'commonsettings');
+				$this->Form->fieldSelect('common_settings', $this->Html->ifSet($common_settings['all']), $this->Html->ifSet($this->post['common_settings']), array('id' => 'cronCommonSetting', 'class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.minute', true), 'minute');
+				$this->Form->fieldText('jobminute', $this->Html->ifSet($this->post['jobminute']), array('id' => "minute", 'class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.commonsettings', true), 'cronCommonSettingMinute');
+				$this->Form->fieldSelect('common_settings_minute', $this->Html->ifSet($common_settings['minute']), $this->Html->ifSet($this->post['common_settings_minute']), array('id' => "cronCommonSettingMinute", 'class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.hour', true), 'hour');
+				$this->Form->fieldText('jobhour', $this->Html->ifSet($this->post['jobhour']), array('id' => "hour", 'class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.commonsettings', true), 'cronCommonSettingHour');
+				$this->Form->fieldSelect('common_settings_hour', $this->Html->ifSet($common_settings['hour']), $this->Html->ifSet($this->post['common_settings_hour']), array('id' => "cronCommonSettingHour", 'class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.day', true), 'day');
+				$this->Form->fieldText('jobday', $this->Html->ifSet($this->post['jobday']), array('id' => "day", 'class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.commonsettings', true), 'cronCommonSettingDay');
+				$this->Form->fieldSelect('common_settings_day', $this->Html->ifSet($common_settings['day']), $this->Html->ifSet($this->post['common_settings_day']), array('id' => "cronCommonSettingDay", 'class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.month', true), 'jobmonth');
+				$this->Form->fieldText('jobmonth', $this->Html->ifSet($this->post['jobmonth']), array('id' => "month", 'class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.commonsettings', true), 'cronCommonSettingMonth');
+				$this->Form->fieldSelect('common_settings_month', $this->Html->ifSet($common_settings['month']), $this->Html->ifSet($this->post['common_settings_month']), array('id' => "cronCommonSettingMonth", 'class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.weekday', true), 'weekday');
+				$this->Form->fieldText('jobweekday', $this->Html->ifSet($this->post['jobweekday']), array('id' => "weekday", 'class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.commonsettings', true), 'cronCommonSettingWeekDay');
+				$this->Form->fieldSelect('common_settings_weekday', $this->Html->ifSet($common_settings['weekday']), $this->Html->ifSet($this->post['common_settings_weekday']), array('id' => "cronCommonSettingWeekDay", 'class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.command', true), 'command');
+				$this->Form->fieldText('command', $this->Html->ifSet($this->post['command']), array('id' => "command", 'class' => "form-control"));
+				?>
+			</li>
+		</ul>
+		<div class="button_row">
+			<a class="btn_right submit cpExtendedSubmit" href="#"><?php $this->_('Cpe.button.createcronjob'); ?></a>
+		</div>
+	<?php $this->Form->end();?>
+</div>
+
+<div class="title_row">
+	<h3><?php $this->_('Cpe.titles.cron.list'); ?></h3>
+</div>
+<div class="pad">
+	<table class="table">
+		<thead>
+			<tr class="heading_row">
+				<td><span><?php $this->_("Cpe.th.minute");?></span></td>
+				<td><span><?php $this->_("Cpe.th.hour");?></span></td>
+				<td><span><?php $this->_("Cpe.th.day");?></span></td>
+				<td><span><?php $this->_("Cpe.th.month");?></span></td>
+				<td><span><?php $this->_("Cpe.th.weekday");?></span></td>
+				<td><span><?php $this->_("Cpe.th.command");?></span></td>
+				<td><span><?php $this->_("Cpe.th.actions");?></span></td>
+			</tr>
+		</thead>
+		<tbody>
+		<?php $i = 1; ?>
+		<?php foreach($this->jobs->cpanelresult->data as $job){ ?>
+			<?php if(isset($job->command)){ ?>
+			<tr <?php if($i % 2 == 0){ ?>class="odd_row"<?php } ?>>
+            	<td><?php $this->Html->_($job->minute); ?></td>
+            	<td><?php $this->Html->_($job->hour); ?></td>
+            	<td><?php $this->Html->_($job->day); ?></td>
+            	<td><?php $this->Html->_($job->month); ?></td>
+            	<td><?php $this->Html->_($job->weekday); ?></td>
+            	<td><p style="color: #c7254e; background: #f9f2f4; padding: 5px;"><?php $this->Html->_($job->command); ?></p></td>
+                <td>
+                	<div class="btn-group">
+                    	<a href="<?php echo $this->Html->safe('edit/?line='.$job->count.'&data='.  base64_encode(serialize($job))); ?>" class="cpanelExtendedAjaxRequest"><?php $this->_('Cpe.button.edit'); ?></a>
+						<a href="<?php echo $this->Html->safe('delete/?line='.$job->count); ?>" class="deleteCronJob cpanelExtendedAjaxRequest"><?php $this->_('Cpe.button.delete'); ?></a>
+                    </div>
+            	</td>
+            </tr>
+            <tr class="expand_details modifyData" style="display: none;">
+            	<td class="subtable" colspan="7"></td>
+            </tr>
+			<?php } ?>
+			<?php $i++; ?>
+		<?php } ?>
+		</tbody>
+	</table>
+</div>
+
+<?php echo $this->jsScripts; ?>

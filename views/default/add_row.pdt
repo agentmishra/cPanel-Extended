@@ -60,7 +60,7 @@
 						$this->Form->fieldTextarea("key", $this->Html->ifSet($vars->key));
 						?>
 					</li>
-                                        <li>
+					<li>
 						<?php
 						$this->Form->label($this->_("Cpe.row_meta.port_number", true), "port_number");
 						$this->Form->fieldText("port_number", $this->Html->ifSet($vars->port_number, 2087), array("style" => "width: 90px;"));
@@ -121,6 +121,20 @@
 					<li>
 						<?php
 						$this->Form->fieldTextarea("notes", $this->Html->ifSet($vars->notes));
+						?>
+					</li>
+				</ul>
+			</div>
+
+			<div class="title_row">
+				<h3><?php $this->_("Cpe.add_row.pagetoimage_title");?></h3>
+			</div>
+			<div class="pad">
+				<ul>
+					<li>
+						<?php
+						$this->Form->label($this->_("Cpe.row_meta.pagetoimage_key", true), "pagetoimage_key", array('class'=>"inline"));
+						$this->Form->fieldText("pagetoimage_key", $this->Html->ifSet($vars->pagetoimage_key));
 						?>
 					</li>
 				</ul>

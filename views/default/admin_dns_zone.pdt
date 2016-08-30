@@ -1,0 +1,140 @@
+<?php
+//  CyanDark Incorporated
+//  Copyright (c) 2012-2016 CyanDark, Inc. All Rights Reserved.
+//
+//  This software is furnished under a license and may be used and copied
+//  only  in  accordance  with  the  terms  of such  license and with the
+//  inclusion of the above copyright notice.  This software  or any other
+//  copies thereof may not be provided or otherwise made available to any
+//  other person.  No title to and  ownership of the  software is  hereby
+//  transferred.
+//
+//  You may not reverse  engineer, decompile, defeat  license  encryption
+//  mechanisms, or  disassemble this software product or software product
+//  license. CyanDark may terminate this license if you don't comply with
+//  any of the  terms  and conditions  set  forth in our end user license
+//  agreement (EULA).  In such event, licensee  agrees to return licensor
+//  or  destroy all copies  of  software  upon termination of the license
+?>
+<div class="title_row first">
+	<h3><?php $this->_('Cpe.dns_zone'); ?></h3>
+</div>
+<div class="pad">
+	<table class="table">
+		<thead>
+			<tr class="heading_row">
+				<td><span><?php $this->_("Cpe.ttl");?></span></td>
+				<td><span><?php $this->_("Cpe.ttl.name");?></span></td>
+				<td><span><?php $this->_("Cpe.ttl.record");?></span></td>
+				<td><span><?php $this->_("Cpe.ttl.type");?></span></td>
+				<td><span><?php $this->_("Cpe.ttl.class");?></span></td>
+				<td><span><?php $this->_("Cpe.add_row.remove_name_server");?></span></td>
+			</tr>
+		</thead>
+		<tbody>
+		<?php $i = 1; ?>
+		<?php foreach($response['cpanelresult']['data'] as $entry){ ?>
+			<tr <?php if($i % 2 == 0){ ?>class="odd_row"<?php } ?>>
+				<?php if($entry['type'] == 'CNAME' && isset($entry['name'])){ ?>
+				<tr>
+					<td><?= $entry['ttl']; ?></td>
+					<td><?= $entry['name']; ?></td>
+					<td><?= $entry['cname']; ?></td>
+					<td><?= $entry['type']; ?></td>
+					<td><?= $entry['class']; ?></td>
+					<td><a href="?delete=<?= $entry['line']; ?>"><i class="fa fa-trash-o"></i> <?= Language::_("Cpe.add_row.remove_name_server", true); ?></a></td>
+				</tr>
+				<?php } ?>
+				<?php if($entry['type'] == 'NS' && isset($entry['name'])){ ?>
+				<tr>
+					<td><?= $entry['ttl']; ?></td>
+					<td><?= $entry['name']; ?></td>
+					<td><?= $entry['nsdname']; ?></td>
+					<td><?= $entry['type']; ?></td>
+					<td><?= $entry['class']; ?></td>
+					<td><a href="?delete=<?= $entry['line']; ?>"><i class="fa fa-trash-o"></i> <?= Language::_("Cpe.add_row.remove_name_server", true); ?></a></td>
+				</tr>
+				<?php } ?>
+				<?php if($entry['type'] == 'MX' && isset($entry['name'])){ ?>
+				<tr>
+					<td><?= $entry['preference']; ?></td>
+					<td><?= $entry['name']; ?></td>
+					<td><?= $entry['exchange']; ?></td>
+					<td><?= $entry['type']; ?></td>
+					<td><?= $entry['class']; ?></td>
+					<td><a href="?deletemx=<?= $entry['exchange']; ?>&pref=<?= $entry['preference']; ?>"><i class="fa fa-trash-o"></i> <?= Language::_("Cpe.add_row.remove_name_server", true); ?></a></td>
+				</tr>
+				<?php } ?>
+				<?php if($entry['type'] == 'TXT' && isset($entry['name'])){ ?>
+				<tr>
+					<td><?= $entry['ttl']; ?></td>
+					<td><?= $entry['name']; ?></td>
+					<td><input class="form-control" value="<?= $entry['txtdata']; ?>" disabled/></td>
+					<td><?= $entry['type']; ?></td>
+					<td><?= $entry['class']; ?></td>
+					<td><a href="?delete=<?= $entry['line']; ?>"><i class="fa fa-trash-o"></i> <?= Language::_("Cpe.add_row.remove_name_server", true); ?></a></td>
+				</tr>
+				<?php } ?>
+				<?php if($entry['type'] == 'AAAA' && isset($entry['name'])){ ?>
+				<tr>
+					<td><?= $entry['ttl']; ?></td>
+					<td><?= $entry['name']; ?></td>
+					<td><?= $entry['record']; ?></td>
+					<td><?= $entry['type']; ?></td>
+					<td><?= $entry['class']; ?></td>
+					<td><a href="?delete=<?= $entry['line']; ?>"><i class="fa fa-trash-o"></i> <?= Language::_("Cpe.add_row.remove_name_server", true); ?></a></td>
+				</tr>
+				<?php } ?>
+				<?php if($entry['type'] == 'A' && isset($entry['name']) && isset($entry['address'])){ ?>
+				<tr>
+					<td><?= $entry['ttl']; ?></td><td><?= $entry['name']; ?></td>
+					<td><?= $entry['record']; ?></td><td><?= $entry['type']; ?></td>
+					<td><?= $entry['class']; ?></td>
+					<td><a href="?delete=<?= $entry['line']; ?>"><i class="fa fa-trash-o"></i> <?= Language::_("Cpe.add_row.remove_name_server", true); ?></a></td>
+				</tr>
+				<?php } ?>
+			</tr>
+			<?php $i++; ?>
+		<?php } ?>
+			<tr>
+				<?php $this->Form->create('', array('id' => 'dns_zone')); ?>
+				<td>
+					<input type="text" name="ttl" value="14400" id="ttl" class="form-control">
+				</td>
+				<td>
+					<input type="text" name="name" value="" id="name" class="form-control">
+				</td>
+				<td>
+					<input type="text" name="record" value="" id="record" class="form-control">
+				</td>
+				<td>
+					<select name="type" id="type" class="form-control">
+						<option value="A">A</option>
+						<option value="AAAA">AAAA</option>
+						<option value="CNAME">CNAME</option>
+						<option value="MX">MX</option>
+						<option value="TXT">TXT</option>
+					</select>
+				</td>
+				<td>
+					<div style=" margin-top: 7px;"><b>IN</b></div>
+				</td>
+				<td>
+					<button type="submit"><i class="fa fa-plus-circle"></i> <?= Language::_("Cpe.button.save", true); ?></button>
+				</td>
+				<?php $this->Form->end(); ?>
+			</tr>
+		</tbody>
+	</table>
+
+	<script>
+	$('#type').change(function(){
+		if($(this).val() == 'MX'){
+			$('#name').attr('disabled', 'disabled');
+			$('#ttl').attr('value', '1');
+		} else {
+			$('#name').removeAttr('disabled');
+			$('#ttl').attr('value', '14400');
+		}
+	});
+	</script>

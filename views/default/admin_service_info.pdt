@@ -16,6 +16,7 @@
 //  agreement (EULA).  In such event, licensee  agrees to return licensor
 //  or  destroy all copies  of  software  upon termination of the license
 ?>
+
 	<table class="table">
 		<tr class="heading_row">
 			<td class="fixed_small center border_none"><span class="paymnt_arrow"></span></td>
@@ -26,22 +27,19 @@
 		</tr>
 		<tr>
 			<td></td>
-			<td><?php $this->Html->_($service_fields->cpanel_username);?></td>
-			<td><?php $this->Html->_($service_fields->cpanel_password);?></td>
+			<td><?php $this->Html->_($fields->cpanel_username);?></td>
+			<td><?php $this->Html->_($fields->cpanel_password);?></td>
 			<td><?php $this->Html->_($module_row->meta->host_name);?></td>
 			<td>
-				<?php
-				$this->Form->create($this->Html->safe("https://" . $this->Html->ifSet($module_row->meta->host_name) . ":2083/login/"), array('target' => "_blank"));
-				$this->Form->fieldHidden("user", $this->Html->ifSet($service_fields->cpanel_username));
-				$this->Form->fieldHidden("pass", $this->Html->ifSet($service_fields->cpanel_password));
-				?>
-				<a id="cpanel_login<?php $this->Html->_($service->id);?>" href="#"><?php $this->_("Cpe.service_info.option_login");?></a>
-				<?php
-				$this->Form->end();
-				?>
+				<a target="_blank" href="<?php $this->Html->_($sso); ?>"><?php $this->_("Cpe.service_info.option_login");?></a>
 			</td>
 		</tr>
 	</table>
+	<?php if($service->status == 'suspended'){ ?>
+	<article class="error_box alert">
+		<p style="padding: 0 0 0 30px; margin: 0;"><?php $this->_("Cpe.label.suspension_reason");?>:</b> <?php if(!empty($fields->cpanel_suspension_reason)){ ?><?= $this->Html->ifSet($fields->cpanel_suspension_reason); ?><?php } else { $this->_("Cpe.label.suspension_reason_non_payment"); } ?></p>
+	</article>
+	<?php } ?>
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$('#cpanel_login<?php $this->Html->_($service->id);?>').click(function(e) {

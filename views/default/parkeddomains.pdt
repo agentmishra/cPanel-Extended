@@ -39,7 +39,9 @@
 				<?php $this->_('Cpe.misc.parkedhint'); ?>
 			</div>
 			<div class="pull-right">
-				<button type="submit" class="btn btn-default cpExtendedSubmit"><i class="fa fa-plus-circle"></i> <?php $this->_('Cpe.button.createparkeddomain'); ?></button>
+				<div class="form-group">
+					<button type="submit" class="btn btn-default cpExtendedSubmit"><i class="fa fa-plus-circle"></i> <?php $this->_('Cpe.button.createparkeddomain'); ?></button>
+				</divZ
 			</div>
 			<?php $this->Form->end(); ?>
 		</div>

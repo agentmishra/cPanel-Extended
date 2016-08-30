@@ -1,6 +1,6 @@
 $(function() 
 {
-    var LOADERURL = '/blesta/components/modules/cpanelextended/views/default/images/loader.gif';
+    var LOADERURL = '/components/modules/cpanelextended/views/default/images/loader.gif';
     var BASEURL = document.location.href;
     
     $.fn.showLoaderInsideTable = function(content)
@@ -132,7 +132,7 @@ $(function()
             
             $('html, body').animate({
                 scrollTop: row.offset().top
-            }, 1000);
+            }, 800);
         });
  
         e.preventDefault();

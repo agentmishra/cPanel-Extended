@@ -1,0 +1,322 @@
+<?php
+//  CyanDark Incorporated
+//  Copyright (c) 2012-2016 CyanDark, Inc. All Rights Reserved.
+//
+//  This software is furnished under a license and may be used and copied
+//  only  in  accordance  with  the  terms  of such  license and with the
+//  inclusion of the above copyright notice.  This software  or any other
+//  copies thereof may not be provided or otherwise made available to any
+//  other person.  No title to and  ownership of the  software is  hereby
+//  transferred.
+//
+//  You may not reverse  engineer, decompile, defeat  license  encryption
+//  mechanisms, or  disassemble this software product or software product
+//  license. CyanDark may terminate this license if you don't comply with
+//  any of the  terms  and conditions  set  forth in our end user license
+//  agreement (EULA).  In such event, licensee  agrees to return licensor
+//  or  destroy all copies  of  software  upon termination of the license
+?>
+<div class="title_row first">
+	<h3><?php $this->_('Cpe.subtitles.ssl.keys'); ?></h3>
+</div>
+<div class="pad">
+	<table class="table">
+		<thead>
+			<tr class="heading_row">
+				<td><span><?php $this->_("Cpe.th.domain");?></span></td>
+				<td><span><?php $this->_("Cpe.th.actions");?></span></td>
+			</tr>
+		</thead>
+		<tbody>
+		<?php $i = 1; ?>
+		<?php foreach($this->keys->cpanelresult->data as $i => $key){ ?>
+			<tr <?php if($i % 2 == 0){ ?>class="odd_row"<?php } ?>>
+            	<td><?php $this->Html->_($key->host); ?></td>
+            	<td>
+                	<a href="<?php echo $this->Html->safe('viewkey/?domain='.$key->host); ?>" class="cpanelExtendedAjaxRequest"><i class="fa fa-search"></i> <?php $this->_('Cpe.button.view'); ?></a>
+            	</td>
+            </tr>
+            <tr class="expand_details modifyData" style="display: none;">
+            	<td class="subtable" colspan="2"></td>
+            </tr>
+			<?php $i++; ?>
+		<?php } ?>
+		</tbody>
+	</table>
+	<div class="button_row">
+		<button id="showUploadKeyForm"><?php $this->_('Cpe.button.uploadkey'); ?></button>
+		<button id="showGenerateKeyForm"><?php $this->_('Cpe.button.generatekey'); ?></button>
+	</div>
+</div>
+
+	<div class="inner" id="uploadSslKeyBox" style="display: none;">
+		<div class="title_row">
+			<h3><?php $this->_('Cpe.subtitles.ssl.upload_private_keys'); ?></h3>
+		</div>
+		<div class="pad">
+			<div class="errorscontainer marbot10 martop10"></div>
+			<?php $this->Form->create('uploadkey', array('id' => 'uploadKey')); ?>
+				<ul>
+					<li>
+						<?php
+						$this->Form->label($this->_('Cpe.label.domain', true), 'domain');
+						$this->Form->fieldText('domain', $this->Html->ifSet($this->post['domain']), array('class' => "form-control"));
+						?>
+					</li>
+					<li>
+						<?php
+						$this->Form->label($this->_('Cpe.label.or', true), 'selectdomain');
+						$this->Form->fieldSelect('selectdomain', $this->domains, $this->Html->ifSet($this->post['selectdomain']), array('class' => "form-control"));
+						?>
+					</li>
+					<li>
+						<?php
+						$this->Form->label($this->_('Cpe.label.keypaste', true), 'key');
+						$this->Form->fieldTextarea('key', $this->Html->ifSet($this->post['key']), array('class' => "form-control"));
+						?>
+					</li>
+				</ul>
+				<div class="button_row">
+					<a class="btn_right submit cpExtendedSubmit" href="#"><?php $this->_('Cpe.button.install'); ?></a>
+				</div>
+			<?php $this->Form->end(); ?>
+		</div>
+	</div>
+
+	<div class="inner" id="generateSslKeyBox" style="display: none;">
+		<div class="title_row">
+			<h3><?php $this->_('Cpe.subtitles.ssl.generate_private_keys'); ?></h3>
+		</div>
+		<div class="pad">
+			<div class="errorscontainer marbot10 martop10"></div>
+			<?php $this->Form->create('generatekey', array('id' => 'generateSslKey')); ?>
+				<ul>
+					<li>
+						<?php
+						$this->Form->label($this->_('Cpe.label.domain', true), 'domain');
+						$this->Form->fieldText('domain', $this->Html->ifSet($this->post['domain']), array('class' => "form-control"));
+						?>
+					</li>
+					<li>
+						<?php
+						$this->Form->label($this->_('Cpe.label.or', true), 'selectdomain');
+						$this->Form->fieldSelect('selectdomain', $this->Html->ifSet($this->domains), $this->Html->ifSet($this->post['selectdomain']), array('class' => "form-control"));
+						?>
+					</li>
+					<li>
+						<?php
+						$this->Form->label($this->_('Cpe.label.keysize', true), 'keysize');
+						$this->Form->fieldSelect('keysize', array('1024' => '1,024 bits', '2048' => '2,048 bits', '4096' => '4,096 bits'), $this->Html->ifSet($this->post['keysize']), array('class' => "form-control"));
+						?>
+					</li>
+				</ul>
+				<div class="button_row">
+					<a class="btn_right submit cpExtendedSubmit" href="#"><?php $this->_('Cpe.button.generate'); ?></a>
+				</div>
+			<?php $this->Form->end(); ?>
+		</div>
+    </div>
+
+<div class="title_row">
+	<h3><?php $this->_('Cpe.subtitles.ssl.csr_keys'); ?></h3>
+</div>
+<div class="pad">
+	<table class="table">
+		<thead>
+			<tr class="heading_row">
+				<td><span><?php $this->_("Cpe.th.domain");?></span></td>
+			</tr>
+		</thead>
+		<tbody>
+		<?php $i = 1; ?>
+		<?php foreach($this->csrs->cpanelresult->data as $i => $key){ ?>
+			<tr <?php if($i % 2 == 0){ ?>class="odd_row"<?php } ?>>
+            	<td><?php echo $this->Html->_($key->host); ?></td>
+            </tr>
+			<?php $i++; ?>
+		<?php } ?>
+		</tbody>
+	</table>
+	<div class="button_row">
+        <button id="showGenerateCsrForm"><i class="fa fa-plus-circle"></i> <?php $this->_('Cpe.button.generatecsr'); ?></button>
+	</div>
+</div>
+	
+	<div class="inner" id="generateCsrBox" style="display: none;">
+		<div class="title_row">
+			<h3><?php $this->_('Cpe.subtitles.ssl.csr'); ?></h3>
+		</div>
+		<div class="pad">
+			<div class="errorscontainer marbot10 martop10"></div>
+			<?php $this->Form->create('generatecsr', array('id' => 'generateCsr')); ?>
+				<ul>
+					<li>
+						<?php
+						$this->Form->label($this->_('Cpe.label.selectdom', true), 'domain');
+						$this->Form->fieldSelect('domain', $this->Html->ifSet($this->keysdomains), $this->Html->ifSet($this->post['selectdomain']), array('class' => "form-control"));
+						?>
+					</li>
+					<li>
+						<?php
+						$this->Form->label($this->_('Cpe.label.country', true), 'country');
+						$this->Form->fieldText('country', $this->Html->ifSet($this->post['country'], $this->Html->ifSet($this->client->country)), array('class' => "form-control"));
+						?>
+					</li>
+					<li>
+						<?php
+						$this->Form->label($this->_('Cpe.label.state', true), 'state');
+						$this->Form->fieldText('state', $this->Html->ifSet($this->post['state'], $this->Html->ifSet($this->client->state)), array('class' => "form-control"));
+						?>
+					</li>
+					<li>
+						<?php
+						$this->Form->label($this->_('Cpe.label.city', true), 'city');
+						$this->Form->fieldText('city', $this->Html->ifSet($this->post['city'], $this->Html->ifSet($this->client->city)), array('class' => "form-control"));
+						?>
+					</li>
+					<li>
+						<?php
+						$this->Form->label($this->_('Cpe.label.company', true), 'company');
+						$this->Form->fieldText('company', $this->Html->ifSet($this->post['company'], $this->Html->ifSet($this->client->company)), array('class' => "form-control"));
+						?>
+					</li>
+					<li>
+						<?php
+						$this->Form->label($this->_('Cpe.label.companydiv', true), 'companydivision');
+						$this->Form->fieldText('companydivision', $this->Html->ifSet($this->post['companydivision']), array('class' => "form-control"));
+						?>
+					</li>
+					<li>
+						<?php
+						$this->Form->label($this->_('Cpe.label.email', true), 'email');
+						$this->Form->fieldText('email', $this->Html->ifSet($this->post['email'], $this->Html->ifSet($this->client->email)), array('class' => "form-control"));
+						?>
+					</li>
+					<li>
+						<?php
+						$this->Form->label($this->_('Cpe.label.passphrase', true), 'pass');
+						$this->Form->fieldText('pass', $this->Html->ifSet($this->post['pass']), array('class' => "form-control"));
+						?>
+					</li>
+				</ul>
+				<div class="button_row">
+					<a class="btn_right submit cpExtendedSubmit" href="#"><?php $this->_('Cpe.button.generate'); ?></a>
+				</div>
+			<?php $this->Form->end(); ?>
+		</div>
+	</div>
+
+<div class="title_row">
+	<h3><?php $this->_('Cpe.subtitles.ssl.crt'); ?></h3>
+</div>
+<div class="pad">
+	<table class="table">
+		<thead>
+			<tr class="heading_row">
+				<td><span><?php $this->_("Cpe.label.domain");?></span></td>
+				<td><span><?php $this->_("Cpe.label.expire");?></span></td>
+				<td><span><?php $this->_("Cpe.label.actions");?></span></td>
+			</tr>
+		</thead>
+		<tbody>
+		<?php $i = 1; ?>
+		<?php foreach($this->crts->cpanelresult->data as $i => $key){ ?>
+			<tr <?php if($i % 2 == 0){ ?>class="odd_row"<?php } ?>>
+            	<td><?php $this->Html->_($key->host); ?></td>
+                <td><?php $this->Html->_($key->expiredate); ?></td>
+                <td><a href="<?php echo $this->Html->safe('viewcrt/?domain='.$key->host); ?>" class="btn btn-default btn-sm cpanelExtendedAjaxRequest"><i class="fa fa-search"></i> <?php $this->_('Cpe.button.view'); ?></a></td>
+            </tr>
+            <tr class="expand_details modifyData" style="display: none;">
+            	<td class="subtable" colspan="3"></td>
+            </tr>
+			<?php $i++; ?>
+		<?php } ?>
+		</tbody>
+	</table>
+	<div class="button_row">
+    	<button id="showUploadCrtForm"><i class="fa fa-upload"></i> <?php $this->_('Cpe.button.uploadcrt'); ?></button>
+    	<button id="showGenerateCrtForm"><i class="fa fa-plus-circle"></i> <?php $this->_('Cpe.button.generatecrt'); ?></button>
+   	</div>
+</div>
+
+	<div class="inner" id="uploadCrtBox" style="display: none;">
+		<div class="title_row">
+			<h3><?php $this->_('Cpe.subtitles.ssl.upload_cert'); ?></h3>
+		</div>
+		<div class="pad">
+			<div class="errorscontainer marbot10 martop10"></div>
+			<?php $this->Form->create('uploadcrt', array('id' => 'uploadCrt')); ?>
+				<ul>
+					<div class="form-group">
+						<?php
+						$this->Form->label($this->_('Cpe.label.keypaste'), 'key');
+						$this->Form->fieldTextarea('key', $this->Html->ifSet($this->post['key']), array('class' => "form-control"));
+						?>
+					</div>
+				</ul>
+				<div class="button_row">
+					<a class="btn_right submit cpExtendedSubmit" href="#"><?php $this->_('Cpe.button.upload'); ?></a>
+				</div>
+			<?php $this->Form->end(); ?>
+		</div>
+	</div>
+			
+	<div class="inner" id="generateCrtBox" style="display: none;">
+		<div class="title_row">
+			<h3><?php $this->_('Cpe.subtitles.ssl.generate_cert'); ?></h3>
+		</div>
+		<div class="pad">
+			<div class="errorscontainer marbot10 martop10"></div>
+			<?php $this->Form->create('generatecrt', array('id' => 'generateCrt')); ?>
+				<ul>
+					<li>
+						<?php
+						$this->Form->label($this->_('Cpe.label.selectdom', true), 'domain');
+						$this->Form->fieldSelect('domain', $this->keysdomains, $this->Html->ifSet($this->post['selectdomain']), array('class' => "form-control"));
+						?>
+					</li>
+					<li>
+						<?php
+						$this->Form->label($this->_('Cpe.label.country', true), 'country');
+						$this->Form->fieldText('country', $this->Html->ifSet($this->post['country'], $this->Html->ifSet($this->client->country)), array('class' => "form-control"));
+						?>
+					</li>
+					<li>
+						<?php
+						$this->Form->label($this->_('Cpe.label.state', true), 'state');
+						$this->Form->fieldText('state', $this->Html->ifSet($this->post['state'], $this->Html->ifSet($this->client->state)), array('class' => "form-control"));
+						?>
+					</li>
+					<li>
+						<?php
+						$this->Form->label($this->_('Cpe.label.city', true), 'city');
+						$this->Form->fieldText('city', $this->Html->ifSet($this->post['city'], $this->Html->ifSet($this->client->city)), array('class' => "form-control"));
+						?>
+					</li>
+					<li>
+						<?php
+						$this->Form->label($this->_('Cpe.label.company', true), 'company');
+						$this->Form->fieldText('company', $this->Html->ifSet($this->post['company'], $this->Html->ifSet($this->client->company)), array('class' => "form-control"));
+						?>
+					</li>
+					<li>
+						<?php
+						$this->Form->label($this->_('Cpe.label.companydiv', true), 'companydivision');
+						$this->Form->fieldText('companydivision', $this->Html->ifSet($this->post['companydivision']), array('class' => "form-control"));
+						?>
+					</li>
+					<li>
+						<?php
+						$this->Form->label($this->_('Cpe.label.email', true), 'email');
+						$this->Form->fieldText('email', $this->Html->ifSet($this->post['email'], $this->Html->ifSet($this->client->email)), array('class' => "form-control"));
+						?>
+					</li>
+				</ul>
+				<div class="button_row">
+					<a class="btn_right submit cpExtendedSubmit" href="#"><?php $this->_('Cpe.button.generate'); ?></a>
+				</div>
+			<?php $this->Form->end(); ?>
+		</div>
+	</div>
+
+<?php echo $this->jsScripts; ?>

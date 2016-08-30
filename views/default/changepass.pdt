@@ -33,8 +33,10 @@
 				$this->Form->fieldPassword('pass_confirm', array('id' => 'pass_confirm', 'class' => "form-control"));
 				?>
 			</div>
-		<button class="btn btn-default pull-right">
-			<i class="fa fa-edit"></i> <?php $this->_('Cpe.button.changepassword'); ?>
-		</button>
+			<div class="pull-right">
+				<div class="form-group">
+					<button class="btn btn-default"><i class="fa fa-edit"></i> <?php $this->_('Cpe.button.changepassword'); ?></button>
+				</div>
+			</div>
 	</div>
 	<?php $this->Form->end(); ?>

@@ -1,0 +1,88 @@
+<?php
+//  CyanDark Incorporated
+//  Copyright (c) 2012-2016 CyanDark, Inc. All Rights Reserved.
+//
+//  This software is furnished under a license and may be used and copied
+//  only  in  accordance  with  the  terms  of such  license and with the
+//  inclusion of the above copyright notice.  This software  or any other
+//  copies thereof may not be provided or otherwise made available to any
+//  other person.  No title to and  ownership of the  software is  hereby
+//  transferred.
+//
+//  You may not reverse  engineer, decompile, defeat  license  encryption
+//  mechanisms, or  disassemble this software product or software product
+//  license. CyanDark may terminate this license if you don't comply with
+//  any of the  terms  and conditions  set  forth in our end user license
+//  agreement (EULA).  In such event, licensee  agrees to return licensor
+//  or  destroy all copies  of  software  upon termination of the license
+?>
+
+<link rel="stylesheet" type="text/css" href="<?php echo $this->view_dir;?>css/cpanelextended.css">
+<?php if($service->status != 'suspended'){ ?>
+<div class="row no-space">
+	<?php if($package->meta->dashboard == 'true'){ ?>
+	<div class="col-md-3 col-sm-3 col-xs-3 col-lg-2">
+		<a href="<?= $service_uri; ?>details/">
+			<div class="icon-panel">
+				<img src="<?php echo $this->view_dir;?>images/icons/info.png">
+				<span><?php $this->_("Cpe.details");?></span>
+			</div>
+		</a>
+	</div>
+	<?php } ?>
+	<?php if($package->meta->details == 'true'){ ?>
+	<div class="col-md-3 col-sm-3 col-xs-3 col-lg-2">
+		<a href="<?= $service_uri; ?>dashboard/">
+			<div class="icon-panel">
+				<img src="<?php echo $this->view_dir;?>images/icons/settings.png">
+				<span><?php $this->_("Cpe.dashboard");?></span>
+			</div>
+		</a>
+	</div>
+	<?php } ?>
+	<?php if($package->meta->changepass == 'true'){ ?>
+	<div class="col-md-3 col-sm-3 col-xs-3 col-lg-2">
+		<a href="<?= $service_uri; ?>changepass/">
+			<div class="icon-panel">
+				<img src="<?php echo $this->view_dir;?>images/icons/password.png">
+				<span><?php $this->_("Cpe.changepass");?></span>
+			</div>
+		</a>
+	</div>
+	<?php } ?>
+	<?php if($package->meta->ftpaccounts == 'true' || $package->meta->webdisk == 'true' || $package->meta->backups == 'true'){ ?>
+	<div class="col-md-3 col-sm-3 col-xs-3 col-lg-2">
+		<form method="post" id="file_manager" action="<?= $this->Html->safe("https://" . $this->Html->ifSet($module_row->meta->host_name) . ":2083/login/"); ?>" target="_blank">
+			<input type="hidden" name="user" value="<?= $this->Html->ifSet($service_fields->cpanel_username); ?>">
+			<input type="hidden" name="pass" value="<?= $this->Html->ifSet($service_fields->cpanel_password); ?>">
+			<input type="hidden" name="goto_uri" value="/frontend/paper_lantern/filemanager/index.html?showhidden=1&dir=/public_html">
+		</form>
+		<div class="icon-panel" onclick="$('#file_manager').submit();">
+			<img src="<?php echo $this->view_dir;?>images/icons/folder.png">
+			<span><?php $this->_("Cpe.label.filemanager");?></span>
+		</div>
+	</div>
+	<?php } ?>
+	<?php if($package->meta->loginto == 'true'){ ?>
+	<div class="col-md-3 col-sm-3 col-xs-3 col-lg-2">
+		<form method="post" id="cpanel" action="<?= $this->Html->safe("https://" . $this->Html->ifSet($module_row->meta->host_name) . ":2083/login/"); ?>" target="_blank">
+			<input type="hidden" name="user" value="<?= $this->Html->ifSet($service_fields->cpanel_username); ?>">
+			<input type="hidden" name="pass" value="<?= $this->Html->ifSet($service_fields->cpanel_password); ?>">
+		</form>
+		<div class="icon-panel" onclick="$('#cpanel').submit();">
+			<img src="<?php echo $this->view_dir;?>images/icons/cpanel.png">
+			<span><?php $this->_("Cpe.loginto");?></span>
+		</div>
+	</div>
+	<?php } ?>
+</div>
+<?php } ?>
+<?php if($service->status == 'suspended'){ ?>
+<div class="row">
+	<div class="col-md-12">
+		<div class="alert dark alert-icon alert-warning">
+            <p><b><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <?php $this->_("Cpe.label.suspension_reason"); ?>:</b> <?php if(!empty($service_fields->cpanel_suspension_reason)){ ?><?= $this->Html->ifSet($service_fields->cpanel_suspension_reason); ?><?php } else { $this->_("Cpe.label.suspension_reason_non_payment"); } ?></p>
+        </div>
+	</div>
+</div>
+<?php } ?>

@@ -1,0 +1,90 @@
+<?php
+//  CyanDark Incorporated
+//  Copyright (c) 2012-2016 CyanDark, Inc. All Rights Reserved.
+//
+//  This software is furnished under a license and may be used and copied
+//  only  in  accordance  with  the  terms  of such  license and with the
+//  inclusion of the above copyright notice.  This software  or any other
+//  copies thereof may not be provided or otherwise made available to any
+//  other person.  No title to and  ownership of the  software is  hereby
+//  transferred.
+//
+//  You may not reverse  engineer, decompile, defeat  license  encryption
+//  mechanisms, or  disassemble this software product or software product
+//  license. CyanDark may terminate this license if you don't comply with
+//  any of the  terms  and conditions  set  forth in our end user license
+//  agreement (EULA).  In such event, licensee  agrees to return licensor
+//  or  destroy all copies  of  software  upon termination of the license
+?>
+<div class="title_row first">
+	<h3><?php $this->_("Cpe.subtitles.subdomain.create");?></h3>
+</div>
+<div class="pad">
+	<div class="errorscontainer marbot10 martop10"></div>
+	<?php $this->Form->create('create', array('id' => 'createSubdomain')); ?>
+		<ul>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.subdomain', true), 'subdomainame');
+				$this->Form->fieldText('subdomainname', $this->Html->ifSet($this->post['subdomainname']), array('id' => 'subdomainName', 'class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.domain', true));
+				$this->Form->fieldSelect('maindomain', array_combine(array_values($this->domains), $this->domains), $this->Html->ifSet($this->post['maindomain']), array('id' => 'mainDomain', 'class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php
+                $this->Form->label($this->_('Cpe.label.docroot', true), 'subdomainroot');
+				?>
+				<code>/home/<?php $this->Html->_($this->username); ?>/</code>
+				<?php
+				$this->Form->fieldText('subdomainroot', $this->Html->ifSet($this->post['subdomainroot']), array('class' => "form-control"));
+				?>
+			</li>
+		</ul>
+		<div class="button_row">
+			<a class="btn_right submit" href="#"><?php $this->_('Cpe.button.createsubdomain'); ?></a>
+		</div>
+	<?php $this->Form->end(); ?>
+</div>
+
+<div class="title_row">
+	<h3><?php $this->_("Cpe.subtitles.subdomain.list");?></h3>
+</div>
+<div class="pad">
+	<table class="table">
+		<thead>
+			<tr class="heading_row">
+            	<td><?php $this->_('Cpe.th.subdomain'); ?></td>
+            	<td><?php $this->_('Cpe.th.docroot'); ?></td>
+            	<td><?php $this->_('Cpe.th.redirection'); ?></td>
+            	<td><?php $this->_('Cpe.th.actions'); ?></td>
+			</tr>
+		</thead>
+		<tbody>
+		<?php $i = 1; ?>
+		<?php foreach($this->subdomains->cpanelresult->data as $i => $subdomain){ ?>
+			<tr <?php if($i % 2 == 0){ ?>class="odd_row"<?php } ?>>
+            	<td><?php $this->Html->_($subdomain->domain); ?></td>
+            	<td><?php $this->Html->_($subdomain->dir); ?></td>
+            	<td><?php if($subdomain->status == 'not redirected'): ?> <?php $this->_('Cpe.misc.notredirected'); ?> <?php else: ?><a href="<?php echo $this->Html->safe(urldecode($subdomain->status)); ?>"><?php echo $this->Html->safe(urldecode($subdomain->status)); ?></a><?php endif; ?></td>
+                <td style="width: 180px;">
+                	<div class="btn-group">
+                    	<a href="<?php echo $this->Html->safe('redirect/?domain='.$subdomain->domain) ;?>" class="cpanelExtendedAjaxRequest"><?php $this->_('Cpe.button.redirectto'); ?></a>
+                    	<a href="<?php echo $this->Html->safe('delete/?domain='.$subdomain->domain) ;?>" class="cpanelExtendedAjaxRequest"><?php $this->_('Cpe.button.delete'); ?></a>
+                    </div>
+            	</td>
+			</tr>
+            <tr class="expand_details modifyData" style="display: none;">
+            	<td class="subtable" colspan="5"></td>
+            </tr>
+			<?php $i++; ?>
+		<?php } ?>
+		</tbody>
+	</table>
+</div>
+
+<?php echo $this->jsScripts; ?>

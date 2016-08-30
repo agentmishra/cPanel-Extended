@@ -126,6 +126,20 @@
 				</ul>
 			</div>
 
+			<div class="title_row">
+				<h3><?php $this->_("Cpe.add_row.pagetoimage_title");?></h3>
+			</div>
+			<div class="pad">
+				<ul>
+					<li>
+						<?php
+						$this->Form->label($this->_("Cpe.row_meta.pagetoimage_key", true), "pagetoimage_key", array('class'=>"inline"));
+						$this->Form->fieldText("pagetoimage_key", $this->Html->ifSet($vars->pagetoimage_key));
+						?>
+					</li>
+				</ul>
+			</div>
+
 			<div class="button_row"><a class="btn_right submit" href="#"><?php $this->_("Cpe.edit_row.add_btn");?></a></div>
 			<?php
 			$this->Form->end();

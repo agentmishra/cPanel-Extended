@@ -1,0 +1,66 @@
+<?php
+//  CyanDark Incorporated
+//  Copyright (c) 2012-2016 CyanDark, Inc. All Rights Reserved.
+//
+//  This software is furnished under a license and may be used and copied
+//  only  in  accordance  with  the  terms  of such  license and with the
+//  inclusion of the above copyright notice.  This software  or any other
+//  copies thereof may not be provided or otherwise made available to any
+//  other person.  No title to and  ownership of the  software is  hereby
+//  transferred.
+//
+//  You may not reverse  engineer, decompile, defeat  license  encryption
+//  mechanisms, or  disassemble this software product or software product
+//  license. CyanDark may terminate this license if you don't comply with
+//  any of the  terms  and conditions  set  forth in our end user license
+//  agreement (EULA).  In such event, licensee  agrees to return licensor
+//  or  destroy all copies  of  software  upon termination of the license
+?>
+
+<div class="title_row first">
+	<h3><?php $this->_('Cpe.label.addhost'); ?></h3>
+</div>
+<div class="pad">
+	<div class="errorscontainer marbot10 martop10"></div>
+	<?php $this->Form->create(); ?>
+		<ul>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.subtitles.db.addhost', true), 'addhost_label');
+				?>
+				<?php
+				$this->Form->fieldText('addhost', $this->Html->ifSet($this->post['addhost']), array('id' => 'addhost', 'class' => "form-control"));
+				?>
+			</li>
+		</ul>
+		<div class="button_row">
+			<a class="btn_right submit" href="#"><?php $this->_('Cpe.label.addhost'); ?></a>
+		</div>
+	<?php $this->Form->end(); ?>
+</div>
+
+<div class="title_row">
+	<h3><?php $this->_('Cpe.subtitles.db.currenthosts'); ?></h3>
+</div>
+<div class="pad">
+	<table class="table">
+		<thead>
+			<tr class="heading_row">
+				<td><span><?php $this->_("Cpe.th.host");?></span></td>
+				<td><span><?php $this->_("Cpe.th.actions");?></span></td>
+			</tr>
+		</thead>
+		<tbody>
+		<?php $i = 1; ?>
+		<?php foreach($this->hosts->cpanelresult->data as $host){ ?>
+			<tr <?php if($i % 2 == 0){ ?>class="odd_row"<?php } ?>>
+				<td><?php $this->Html->_($host->uri_host); ?></td>
+				<td><a href="<?php echo $this->Html->safe('?delhost='.$host->uri_host); ?>"><i class="fa fa-ban"></i> <?php $this->_('Cpe.button.delete'); ?></a></td>
+			</tr>
+			<?php $i++; ?>
+		<?php } ?>
+		</tbody>
+	</table>
+</div>
+
+<?php echo $this->jsScripts; ?>

@@ -65,7 +65,9 @@
 				<?php $this->_('Cpe.misc.addonhint'); ?>
 			</div>
 			<div class="pull-right">
-				<button type="submit" class="btn btn-default cpExtendedSubmit"><i class="fa fa-plus-circle"></i> <?php $this->_('Cpe.button.createaddondomain'); ?></button>
+				<div class="form-group">
+					<button type="submit" class="btn btn-default cpExtendedSubmit"><i class="fa fa-plus-circle"></i> <?php $this->_('Cpe.button.createaddondomain'); ?></button>
+				</div>
 			</div>
 			<?php $this->Form->end(); ?>
 		</div>

@@ -1,0 +1,84 @@
+<?php
+//  CyanDark Incorporated
+//  Copyright (c) 2012-2016 CyanDark, Inc. All Rights Reserved.
+//
+//  This software is furnished under a license and may be used and copied
+//  only  in  accordance  with  the  terms  of such  license and with the
+//  inclusion of the above copyright notice.  This software  or any other
+//  copies thereof may not be provided or otherwise made available to any
+//  other person.  No title to and  ownership of the  software is  hereby
+//  transferred.
+//
+//  You may not reverse  engineer, decompile, defeat  license  encryption
+//  mechanisms, or  disassemble this software product or software product
+//  license. CyanDark may terminate this license if you don't comply with
+//  any of the  terms  and conditions  set  forth in our end user license
+//  agreement (EULA).  In such event, licensee  agrees to return licensor
+//  or  destroy all copies  of  software  upon termination of the license
+?>
+<div class="title_row first">
+	<h3><?php $this->_('Cpe.subtitles.parkeddomain.create'); ?></h3>
+</div>
+<div class="pad">
+	<div class="errorscontainer marbot10 martop10"></div>
+	<?php $this->Form->create('create', array('id' => 'createParkedDomain')); ?>
+		<ul>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.domain', true), 'domainname');
+				$this->Form->fieldText('domainname', $this->Html->ifSet($this->post['domainname']), array('class' => "form-control"));
+				?>
+			</li>
+			<li>
+				<?php $this->_('Cpe.misc.parkedhint'); ?>
+			</li>
+		</ul>
+		<div class="button_row">
+			<a class="btn_right submit cpExtendedSubmit" href="#"><?php $this->_('Cpe.button.createparkeddomain'); ?></a>
+		</div>
+	<?php $this->Form->end(); ?>
+</div>
+
+<div class="title_row ">
+	<h3><?php $this->_('Cpe.subtitles.parkeddomain.list'); ?></h3>
+</div>
+<div class="pad">
+	<table class="table">
+		<thead>
+			<tr class="heading_row">
+				<td><span><?php $this->_("Cpe.th.subdomain");?></span></td>
+				<td><span><?php $this->_("Cpe.th.basedir");?></span></td>
+				<td><span><?php $this->_("Cpe.th.redirection");?></span></td>
+				<td><span><?php $this->_("Cpe.th.actions");?></span></td>
+			</tr>
+		</thead>
+		<tbody>
+		<?php $i = 1; ?>
+		<?php foreach($this->domains->cpanelresult->data as $i => $domain){ ?>
+			<tr <?php if($i % 2 == 0){ ?>class="odd_row"<?php } ?>>
+				<td><?php $this->Html->_($domain->domain); ?></td>
+				<td><?php $this->Html->_($domain->basedir); ?></td>
+				<td><?php if($domain->status == 'not redirected'): ?> <?php $this->_('Cpe.misc.notredirected'); ?> <?php else: ?><a href="<?php echo $this->Html->safe(urldecode($domain->status)); ?>"><?php echo $this->Html->safe(urldecode($domain->status)); ?></a><?php endif; ?></td>
+				<td>
+					<div class="btn-group">
+						<a href="<?php echo $this->Html->safe($this->uri.'redirect/?domain='.$domain->domain) ;?>" class="btn btn-default btn-sm cpanelExtendedAjaxRequest"><i class="fa fa-arrows-alt"></i> <?php $this->_('Cpe.button.redirectto'); ?></a>
+						<button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">
+							<span class="caret"></span>
+							<span class="sr-only"><?php $this->_("AppController.sreader.dropdown");?></span>
+						</button>
+						<ul class="dropdown-menu" role="menu">
+							<li><a href="<?php echo $this->Html->safe($this->uri.'delete/?domain='.$domain->domain); ?>" class="btn btn-default btn-sm cpanelExtendedAjaxRequest"><i class="fa fa-ban"></i> <?php $this->_('Cpe.button.delete'); ?></a></li>
+						</ul>
+					</div>
+				</td>
+			</tr>
+			<tr class="expand_details modifyData" style="display: none;">
+				<td class="subtable" colspan="5"></td>
+			</tr>
+			<?php $i++; ?>
+		<?php } ?>
+		</tbody>
+	</table>
+</div>
+
+<?php echo $this->jsScripts; ?>

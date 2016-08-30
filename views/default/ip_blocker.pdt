@@ -67,7 +67,9 @@ echo $this->commonHeader;
         </tbody>
     </table>
 </div>
-<button type="button" id="add_new" class="btn btn-default pull-right"><i class="fa fa-plus-circle"></i> <?php $this->_("Cpe.label.add_new");?></button>
+<div class="form-group">
+    <button type="button" id="add_new" class="btn btn-default pull-right"><i class="fa fa-plus-circle"></i> <?php $this->_("Cpe.label.add_new");?></button>
+</div>
 
 <script type="text/javascript">
     $(document).ready(function () {

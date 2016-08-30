@@ -424,3 +424,6 @@ span.error {
 .row.no-space .col-sm-3 a, .row.no-space .col-sm-3 a:hover, .row.no-space .col-md-3 a, .row.no-space .col-md-3 a:hover, .row.no-space .col-xs-6 a, .row.no-space .col-xs-6 a:hover, .row.no-space .col-lg-2 a, .row.no-space .col-lg-2 a:hover{
 	text-decoration: none !important;
 }
+.panel-body .alert{
+    margin: 0px !important;
+}

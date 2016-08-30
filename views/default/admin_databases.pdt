@@ -1,0 +1,215 @@
+<?php
+//  CyanDark Incorporated
+//  Copyright (c) 2012-2016 CyanDark, Inc. All Rights Reserved.
+//
+//  This software is furnished under a license and may be used and copied
+//  only  in  accordance  with  the  terms  of such  license and with the
+//  inclusion of the above copyright notice.  This software  or any other
+//  copies thereof may not be provided or otherwise made available to any
+//  other person.  No title to and  ownership of the  software is  hereby
+//  transferred.
+//
+//  You may not reverse  engineer, decompile, defeat  license  encryption
+//  mechanisms, or  disassemble this software product or software product
+//  license. CyanDark may terminate this license if you don't comply with
+//  any of the  terms  and conditions  set  forth in our end user license
+//  agreement (EULA).  In such event, licensee  agrees to return licensor
+//  or  destroy all copies  of  software  upon termination of the license
+?>
+<div class="title_row first">
+	<h3><?php $this->_('Cpe.subtitles.db.create'); ?></h3>
+</div>
+<div class="pad">
+	<div class="errorscontainer marbot10 martop10"></div>
+	<?php $this->Form->create('adddb', array('id' => 'createMysqlDatabase')); ?>
+		<ul>
+			<li>
+				<?php
+				$this->Form->label($this->_('Cpe.label.dbname', true), 'dbhname');
+				?>
+				<span><?php $this->Html->_($this->username); ?>_</span>
+				<?php
+				$this->Form->fieldText('dbname', $this->Html->ifSet($this->post['dbname']), array('id' => 'dbname', 'class' => "form-control"));
+				?>
+			</li>
+		</ul>
+		<div class="button_row">
+			<a class="btn_right submit" href="#"><?php $this->_('Cpe.button.createdb'); ?></a>
+		</div>
+	<?php $this->Form->end(); ?>
+</div>
+
+<div class="title_row">
+	<h3><?php $this->_('Cpe.subtitles.db.dblist'); ?></h3>
+</div>
+<div class="pad">
+	<table class="table">
+		<thead>
+			<tr class="heading_row">
+            	<td><?php $this->_('Cpe.th.dbname'); ?></td>
+            	<td><?php $this->_('Cpe.th.size'); ?></td>
+            	<td><?php $this->_('Cpe.th.actions'); ?></td>
+			</tr>
+		</thead>
+		<tbody>
+		<?php $i = 1; ?>
+		<?php foreach($this->databases->cpanelresult->data as $i => $account){ ?>
+			<tr <?php if($i % 2 == 0){ ?>class="odd_row"<?php } ?>>
+                <td><?php $this->Html->_($account->db); ?></td>
+                <td><?php $this->Html->_($account->sizemeg); ?> MB</td>
+                <td style="width: 120px;">
+                    <div class="btn-group">
+                        <a href="<?php echo $this->Html->safe('deletedb/?dbname='.$account->db); ?>" class="cpanelExtendedAjaxRequest"><i class="fa fa-ban"></i> <?php $this->_('Cpe.button.delete'); ?></a>
+                    </div>
+                </td>
+            </tr>
+            <tr class="expand_details modifyData" style="display: none;">
+                <td class="subtable" colspan="5"></td>
+            </tr>
+			<?php $i++; ?>
+		<?php } ?>
+		</tbody>
+	</table>
+</div>
+
+<div class="title_row">
+	<h3><?php $this->_('Cpe.subtitles.db.usercreate'); ?></h3>
+</div>
+<div class="pad">
+	<div class="errorscontainer marbot10 martop10"></div>
+	<?php $this->Form->create('adduser', array('id' => 'createMysqlUser')); ?>
+		<ul>
+			<li>
+				<?php
+                $this->Form->label($this->_('Cpe.label.username', true), 'dbusername'); ?>
+				<span><?php $this->Html->_($this->fields->cpanel_username); ?>_</span>
+				<?php $this->Form->fieldText('dbusername', $this->Html->ifSet($this->post['dbname']), array('class' => "form-control"));?>
+			</li>
+			<li>
+				<?php $this->Form->label($this->_('Cpe.label.password', true), 'dbpassword');?>
+				<button type="button" class="generatePassword" data-field1="dbpassword" data-field2="dbpasswordconfirm"><i class="fa fa-lock"></i> <?php $this->_('Cpe.button.generatepassword'); ?></button>
+				<?php $this->Form->fieldPassword('dbpassword', array('id' => 'dbpassword', 'class' => "form-control", 'style' => "float:left;"));?>
+				<div id="generatedPassword" style="display: none;"><?php $this->_('Cpe.misc.genpasswordtext'); ?> <strong></strong></div>
+				<div class="clearfix"></div>
+			</li>
+			<li>
+				<?php
+                $this->Form->label($this->_('Cpe.label.passwordconfirm', true), 'dbpasswordconfirm');
+                $this->Form->fieldPassword('dbpasswordconfirm', array('id' => 'dbpasswordconfirm', 'class' => "form-control"));
+				?>
+			</li>
+		</ul>
+		
+		<div class="button_row">
+			<a class="btn_right submit" href="#"><?php $this->_('Cpe.button.createuser'); ?></a>
+		</div>
+	<?php $this->Form->end(); ?>
+</div>
+
+<?php if(count($this->dboptions) and count($this->useroptions)): ?>
+<div class="title_row">
+	<h3><?php $this->_('Cpe.subtitles.db.addusertodb'); ?></h3>
+</div>
+<div class="pad">
+	<div class="errorscontainer marbot10 martop10"></div>
+	<?php $this->Form->create('addusertodb', array('id' => 'addUserToDb')); ?>
+		<ul>
+			<li>
+				<?php $this->Form->label($this->_('Cpe.label.dbname', true), 'database');
+                      $this->Form->fieldSelect('database', $this->dboptions, $this->Html->ifSet($this->post['database']), array('class' => "form-control")); ?>
+			</li>
+			<li>
+				<?php $this->Form->label($this->_('Cpe.label.username', true), 'dbuser');
+                      $this->Form->fieldSelect('dbuser', $this->useroptions, $this->Html->ifSet($this->post['dbuser']), array('class' => "form-control")); ?>
+			</li>
+			<li>
+				<?php $this->Form->label($this->_('Cpe.label.privileges', true));?>
+			</li>
+			<li>
+				<label><?php $this->Form->fieldCheckbox('privileges[]', 'alter', true, array('class' => 'privileges')); ?> ALTER</label>
+			</li>
+			<li>
+                <label><?php $this->Form->fieldCheckbox('privileges[]', 'temporary', true, array('class' => 'privileges')); ?> CREATE TEMPORARY TABLES</label>
+			</li>
+			<li>
+                <label><?php $this->Form->fieldCheckbox('privileges[]', 'routine', true, array('class' => 'privileges')); ?> CREATE ROUTINE</label>
+			</li>
+			<li>
+                <label><?php $this->Form->fieldCheckbox('privileges[]', 'create', true, array('class' => 'privileges')); ?> CREATE</label>
+			</li>
+			<li>
+                <label><?php $this->Form->fieldCheckbox('privileges[]', 'delete', true, array('class' => 'privileges')); ?> DELETE</label>
+			</li>
+			<li>
+                <label><?php $this->Form->fieldCheckbox('privileges[]', 'drop', true, array('class' => 'privileges')); ?> DROP</label>
+			</li>
+			<li>
+                <label><?php $this->Form->fieldCheckbox('privileges[]', 'select', true, array('class' => 'privileges')); ?> SELECT</label>
+			</li>
+			<li>
+                <label><?php $this->Form->fieldCheckbox('privileges[]', 'insert', true, array('class' => 'privileges')); ?> INSERT</label>
+			</li>
+			<li>
+                <label><?php $this->Form->fieldCheckbox('privileges[]', 'update', true, array('class' => 'privileges')); ?> UPDATE</label>
+			</li>
+			<li>
+                <label><?php $this->Form->fieldCheckbox('privileges[]', 'references', true, array('class' => 'privileges')); ?> REFERENCES</label>
+			</li>
+			<li>
+                <label><?php $this->Form->fieldCheckbox('privileges[]', 'index', true, array('class' => 'privileges')); ?> INDEX</label>
+			</li>
+			<li>
+                <label><?php $this->Form->fieldCheckbox('privileges[]', 'lock', true, array('class' => 'privileges')); ?> LOCK</label>
+			</li>
+			<li>
+                <label id="togglePrivileges"><?php $this->Form->fieldCheckbox('privileges[]', 'all', true); ?> ALL</label>
+			</li>
+		</ul>
+		<div class="button_row">
+			<a class="btn_right submit" href="#"><?php $this->_('Cpe.button.addusertodb'); ?></a>
+		</div>
+	<?php $this->Form->end(); ?>
+</div>
+<?php endif; ?>
+
+<div class="title_row">
+	<h3><?php $this->_('Cpe.subtitles.db.userlist'); ?></h3>
+</div>
+<div class="pad">
+	<table class="table">
+		<thead>
+			<tr class="heading_row">
+            	<td><?php $this->_('Cpe.th.username'); ?></td>
+            	<td><?php $this->_('Cpe.th.linkeddbs'); ?></td>
+            	<td><?php $this->_('Cpe.th.actions'); ?></td>
+			</tr>
+		</thead>
+		<tbody>
+			<?php $i = 1; ?>
+			<?php foreach($this->users->cpanelresult->data as $user): ?>
+			<tr <?php if($i % 2 == 0){ ?>class="odd_row"<?php } ?>>
+				<td><?php $this->Html->_($user->user); ?></td>
+				<td>
+					<div class="btn-group">
+					<?php foreach($user->dblist as $list): ?>
+					<?php $this->Html->_($list->db); ?>
+					<?php endforeach; ?>
+					</div>
+				</td>
+				<td style="width: 120px;">
+					<div class="btn-group">
+                        <a href="<?php echo $this->Html->safe('changepassworduser/?dbuser='.$user->user); ?>" class="cpanelExtendedAjaxRequest"><?php $this->_('Cpe.changepass'); ?></a>
+						<a href="<?php echo $this->Html->safe('deleteuser/?dbuser='.$user->user); ?>" class="cpanelExtendedAjaxRequest"><i class="fa fa-ban"></i> <?php $this->_('Cpe.button.delete'); ?></a>
+					</div>
+				</td>
+			</tr>
+			<tr class="expand_details modifyData" style="display: none;">
+				<td class="subtable" colspan="3"></td>
+			</tr>
+			<?php $i++; ?>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+</div>
+
+<?php echo $this->jsScripts; ?>
