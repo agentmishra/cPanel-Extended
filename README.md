@@ -1,4 +1,4 @@
-# cPanel Extended v4.4
+# cPanel Extended v5.0
 
 <b>New!</b> Now with Quick Actions, Dashboard, Details Section, Block IP, Backups, New Softaculous and Remote MySQL.
 
@@ -23,5 +23,8 @@ There are many reasons to invest in this gorgeous module and we presented you on
 <li>Disable or Enable Specific secctions for Specific Packages</li>
 <li>Suspension Reason</li>
 <li>Manage cPanel account from Blesta (Admin)</li>
+<li>Page2Image API Integrated</li>
+<li>Auto-Detect domain when a domain type order form is used</li>
+<li>Login to cPanel using SSO</li>
 </ul>
 <b>Note:</b> Remember, Rename the folder to "cpanelextended" before to upload.
