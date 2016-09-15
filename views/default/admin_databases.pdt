@@ -34,7 +34,7 @@
 			</li>
 		</ul>
 		<div class="button_row">
-			<a class="btn_right submit" href="#"><?php $this->_('Cpe.button.createdb'); ?></a>
+			<a class="<?php if(explode(".", BLESTA_VERSION)[0] == 4){ ?>btn btn-default pull-right btn-sm<?php } else { ?>btn_right<?php } ?> submit" href="#"><?php $this->_('Cpe.button.createdb'); ?></a>
 		</div>
 	<?php $this->Form->end(); ?>
 </div>
@@ -101,7 +101,7 @@
 		</ul>
 		
 		<div class="button_row">
-			<a class="btn_right submit" href="#"><?php $this->_('Cpe.button.createuser'); ?></a>
+			<a class="<?php if(explode(".", BLESTA_VERSION)[0] == 4){ ?>btn btn-default pull-right btn-sm<?php } else { ?>btn_right<?php } ?> submit" href="#"><?php $this->_('Cpe.button.createuser'); ?></a>
 		</div>
 	<?php $this->Form->end(); ?>
 </div>
@@ -166,7 +166,7 @@
 			</li>
 		</ul>
 		<div class="button_row">
-			<a class="btn_right submit" href="#"><?php $this->_('Cpe.button.addusertodb'); ?></a>
+			<a class="<?php if(explode(".", BLESTA_VERSION)[0] == 4){ ?>btn btn-default pull-right btn-sm<?php } else { ?>btn_right<?php } ?> submit" href="#"><?php $this->_('Cpe.button.addusertodb'); ?></a>
 		</div>
 	<?php $this->Form->end(); ?>
 </div>

@@ -280,6 +280,7 @@ $lang['Cpe.label.usernamefield'] = "Campo de Usuario";
 $lang['Cpe.label.passwordfield'] = "Campo de Contraseña";
 $lang['Cpe.label.diskreseller'] = "Espacio de Revendedor";
 $lang['Cpe.label.bandreseller'] = "Ancho de Banda de Revendedor";
+$lang['Cpe.label.suspension_reason_non_payment'] = "Falta de pago.";
 
 // Tooltip
 $lang['Cpe.tooltip.quota'] = "Proporcionar una cuota en megabytes, 0 indica que es ilimitada";

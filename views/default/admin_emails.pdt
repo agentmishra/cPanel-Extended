@@ -33,7 +33,7 @@
 			<li>
 				<?php
 				$this->Form->label($this->_('Cpe.label.domain', true), 'emaildomain');
-				$this->Form->fieldSelect('emaildomain', array_combine(array_values($this->domains), $this->domains), $this->Html->ifSet($this->post['emaildomain']), array('id' => 'emailDomain', 'class' => "form-control"));
+				$this->Form->fieldSelect('emaildomain', array_combine(array_values($this->domains), $this->domains), $this->Html->ifSet($this->post['emaildomain']), array('id' => 'emailDomain'));
 				?>
 			</li>
 			<li>
@@ -57,7 +57,7 @@
 			</li>
 		</ul>
 		<div class="button_row">
-			<a class="btn_right submit" href="#"><?php $this->_('Cpe.button.createaccount'); ?></a>
+			<a class="<?php if(explode(".", BLESTA_VERSION)[0] == 4){ ?>btn btn-default pull-right btn-sm<?php } else { ?>btn_right<?php } ?> submit" href="#"><?php $this->_('Cpe.button.createaccount'); ?></a>
 		</div>
 	<?php $this->Form->end(); ?>
 </div>

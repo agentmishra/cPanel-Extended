@@ -1,4 +1,4 @@
-# cPanel Extended v5.0
+# cPanel Extended v5.1
 
 <b>New!</b> Now with Quick Actions, Dashboard, Details Section, Block IP, Backups, New Softaculous and Remote MySQL.
 
@@ -26,5 +26,6 @@ There are many reasons to invest in this gorgeous module and we presented you on
 <li>Page2Image API Integrated</li>
 <li>Auto-Detect domain when a domain type order form is used</li>
 <li>Login to cPanel using SSO</li>
+<li><b>Works with Blesta 4.0</b></li>
 </ul>
 <b>Note:</b> Remember, Rename the folder to "cpanelextended" before to upload.

@@ -62,7 +62,7 @@ echo $this->jsScripts;
 			</li>
 		</ul>
 		<div class="button_row">
-			<a class="btn_right submit" href="#"><?php $this->_('Cpe.button.createaccount'); ?></a>
+			<a class="<?php if(explode(".", BLESTA_VERSION)[0] == 4){ ?>btn btn-default pull-right btn-sm<?php } else { ?>btn_right<?php } ?> submit" href="#"><?php $this->_('Cpe.button.createaccount'); ?></a>
 		</div>
 	<?php $this->Form->end(); ?>
 </div>

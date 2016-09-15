@@ -22,7 +22,7 @@
 <div class="row">
 	<div class="col-md-12">
 		<div class="alert alert-warning">
-            <p><b><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <?php $this->_("Cpe.label.suspension_reason"); ?>:</b> <?php if(!empty($service_fields->cpanel_suspension_reason)){ ?><?= $this->Html->ifSet($service_fields->cpanel_suspension_reason); ?><?php } else { $this->_("Cpe.label.suspension_reason_non_payment"); } ?></p>
+            <p><b><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <?php $this->_("Cpe.label.suspension_reason"); ?>:</b> <?php if(!empty($service_fields->cpanel_suspension_reason)){ ?><?php echo $this->Html->ifSet($service_fields->cpanel_suspension_reason); ?><?php } else { echo $this->_("Cpe.label.suspension_reason_non_payment"); } ?></p>
         </div>
 	</div>
 </div>

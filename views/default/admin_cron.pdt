@@ -27,78 +27,78 @@
 			<li>
 				<?php
 				$this->Form->label($this->_('Cpe.label.commonsettings', true), 'commonsettings');
-				$this->Form->fieldSelect('common_settings', $this->Html->ifSet($common_settings['all']), $this->Html->ifSet($this->post['common_settings']), array('id' => 'cronCommonSetting', 'class' => "form-control"));
+				$this->Form->fieldSelect('common_settings', $this->Html->ifSet($common_settings['all']), $this->Html->ifSet($this->post['common_settings']), array('id' => 'cronCommonSetting'));
 				?>
 			</li>
 			<li>
 				<?php
 				$this->Form->label($this->_('Cpe.label.minute', true), 'minute');
-				$this->Form->fieldText('jobminute', $this->Html->ifSet($this->post['jobminute']), array('id' => "minute", 'class' => "form-control"));
+				$this->Form->fieldText('jobminute', $this->Html->ifSet($this->post['jobminute']), array('id' => "minute"));
 				?>
 			</li>
 			<li>
 				<?php
 				$this->Form->label($this->_('Cpe.label.commonsettings', true), 'cronCommonSettingMinute');
-				$this->Form->fieldSelect('common_settings_minute', $this->Html->ifSet($common_settings['minute']), $this->Html->ifSet($this->post['common_settings_minute']), array('id' => "cronCommonSettingMinute", 'class' => "form-control"));
+				$this->Form->fieldSelect('common_settings_minute', $this->Html->ifSet($common_settings['minute']), $this->Html->ifSet($this->post['common_settings_minute']), array('id' => "cronCommonSettingMinute"));
 				?>
 			</li>
 			<li>
 				<?php
 				$this->Form->label($this->_('Cpe.label.hour', true), 'hour');
-				$this->Form->fieldText('jobhour', $this->Html->ifSet($this->post['jobhour']), array('id' => "hour", 'class' => "form-control"));
+				$this->Form->fieldText('jobhour', $this->Html->ifSet($this->post['jobhour']), array('id' => "hour"));
 				?>
 			</li>
 			<li>
 				<?php
 				$this->Form->label($this->_('Cpe.label.commonsettings', true), 'cronCommonSettingHour');
-				$this->Form->fieldSelect('common_settings_hour', $this->Html->ifSet($common_settings['hour']), $this->Html->ifSet($this->post['common_settings_hour']), array('id' => "cronCommonSettingHour", 'class' => "form-control"));
+				$this->Form->fieldSelect('common_settings_hour', $this->Html->ifSet($common_settings['hour']), $this->Html->ifSet($this->post['common_settings_hour']), array('id' => "cronCommonSettingHour"));
 				?>
 			</li>
 			<li>
 				<?php
 				$this->Form->label($this->_('Cpe.label.day', true), 'day');
-				$this->Form->fieldText('jobday', $this->Html->ifSet($this->post['jobday']), array('id' => "day", 'class' => "form-control"));
+				$this->Form->fieldText('jobday', $this->Html->ifSet($this->post['jobday']), array('id' => "day"));
 				?>
 			</li>
 			<li>
 				<?php
 				$this->Form->label($this->_('Cpe.label.commonsettings', true), 'cronCommonSettingDay');
-				$this->Form->fieldSelect('common_settings_day', $this->Html->ifSet($common_settings['day']), $this->Html->ifSet($this->post['common_settings_day']), array('id' => "cronCommonSettingDay", 'class' => "form-control"));
+				$this->Form->fieldSelect('common_settings_day', $this->Html->ifSet($common_settings['day']), $this->Html->ifSet($this->post['common_settings_day']), array('id' => "cronCommonSettingDay"));
 				?>
 			</li>
 			<li>
 				<?php
 				$this->Form->label($this->_('Cpe.label.month', true), 'jobmonth');
-				$this->Form->fieldText('jobmonth', $this->Html->ifSet($this->post['jobmonth']), array('id' => "month", 'class' => "form-control"));
+				$this->Form->fieldText('jobmonth', $this->Html->ifSet($this->post['jobmonth']), array('id' => "month"));
 				?>
 			</li>
 			<li>
 				<?php
 				$this->Form->label($this->_('Cpe.label.commonsettings', true), 'cronCommonSettingMonth');
-				$this->Form->fieldSelect('common_settings_month', $this->Html->ifSet($common_settings['month']), $this->Html->ifSet($this->post['common_settings_month']), array('id' => "cronCommonSettingMonth", 'class' => "form-control"));
+				$this->Form->fieldSelect('common_settings_month', $this->Html->ifSet($common_settings['month']), $this->Html->ifSet($this->post['common_settings_month']), array('id' => "cronCommonSettingMonth"));
 				?>
 			</li>
 			<li>
 				<?php
 				$this->Form->label($this->_('Cpe.label.weekday', true), 'weekday');
-				$this->Form->fieldText('jobweekday', $this->Html->ifSet($this->post['jobweekday']), array('id' => "weekday", 'class' => "form-control"));
+				$this->Form->fieldText('jobweekday', $this->Html->ifSet($this->post['jobweekday']), array('id' => "weekday"));
 				?>
 			</li>
 			<li>
 				<?php
 				$this->Form->label($this->_('Cpe.label.commonsettings', true), 'cronCommonSettingWeekDay');
-				$this->Form->fieldSelect('common_settings_weekday', $this->Html->ifSet($common_settings['weekday']), $this->Html->ifSet($this->post['common_settings_weekday']), array('id' => "cronCommonSettingWeekDay", 'class' => "form-control"));
+				$this->Form->fieldSelect('common_settings_weekday', $this->Html->ifSet($common_settings['weekday']), $this->Html->ifSet($this->post['common_settings_weekday']), array('id' => "cronCommonSettingWeekDay"));
 				?>
 			</li>
 			<li>
 				<?php
 				$this->Form->label($this->_('Cpe.label.command', true), 'command');
-				$this->Form->fieldText('command', $this->Html->ifSet($this->post['command']), array('id' => "command", 'class' => "form-control"));
+				$this->Form->fieldText('command', $this->Html->ifSet($this->post['command']), array('id' => "command"));
 				?>
 			</li>
 		</ul>
 		<div class="button_row">
-			<a class="btn_right submit cpExtendedSubmit" href="#"><?php $this->_('Cpe.button.createcronjob'); ?></a>
+			<a class="<?php if(explode(".", BLESTA_VERSION)[0] == 4){ ?>btn btn-default pull-right btn-sm<?php } else { ?>btn_right<?php } ?> submit cpExtendedSubmit" href="#"><?php $this->_('Cpe.button.createcronjob'); ?></a>
 		</div>
 	<?php $this->Form->end();?>
 </div>

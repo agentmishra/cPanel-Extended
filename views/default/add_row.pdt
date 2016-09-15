@@ -26,7 +26,7 @@
 			$this->Form->fieldHidden("account_count", $this->Html->ifSet($vars->account_count, 0));
 			?>
 			<div class="title_row first">
-				<h3><?php $this->_("Cpe.add_row.basic_title");?></h3>
+				<h3><?php $this->_("Cpe.add_row.basic_title");?> <?= BLESTA_VERSION; ?></h3>
 			</div>
 			<div class="pad">
 				<ul>
@@ -48,7 +48,7 @@
 						$this->Form->fieldText("user_name", $this->Html->ifSet($vars->user_name));
 						?>
 					</li>
-                                        <li>
+					<li>
 						<?php
 						$this->Form->label($this->_("Cpe.row_meta.password", true), "password");
 						$this->Form->fieldPassword("password", $this->Html->ifSet($vars->password));
@@ -86,7 +86,7 @@
 			</div>
 			<div class="pad">
 				<div class="links_row">
-					<a class="btn_right ns_row_add" href="#"><span><?php $this->_("Cpe.add_row.name_server_btn");?></span></a>
+					<a class="<?php if(explode(".", BLESTA_VERSION)[0] == 4){ ?>btn btn-default pull-right btn-sm<?php } else { ?>btn_right<?php } ?> ns_row_add" href="#"><span><?php $this->_("Cpe.add_row.name_server_btn");?></span></a>
 				</div>
 				<table class="table">
 					<thead>
@@ -140,7 +140,7 @@
 				</ul>
 			</div>
 
-			<div class="button_row"><a class="btn_right submit" href="#"><?php $this->_("Cpe.add_row.add_btn");?></a></div>
+			<div class="button_row"><a class="<?php if(explode(".", BLESTA_VERSION)[0] == 4){ ?>btn btn-default pull-right btn-sm<?php } else { ?>btn_right<?php } ?> submit" href="#"><?php $this->_("Cpe.add_row.add_btn");?></a></div>
 			<?php
 			$this->Form->end();
 			?>

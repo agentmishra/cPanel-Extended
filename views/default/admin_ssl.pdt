@@ -77,7 +77,7 @@
 					</li>
 				</ul>
 				<div class="button_row">
-					<a class="btn_right submit cpExtendedSubmit" href="#"><?php $this->_('Cpe.button.install'); ?></a>
+					<a class="<?php if(explode(".", BLESTA_VERSION)[0] == 4){ ?>btn btn-default pull-right btn-sm<?php } else { ?>btn_right<?php } ?> submit cpExtendedSubmit" href="#"><?php $this->_('Cpe.button.install'); ?></a>
 				</div>
 			<?php $this->Form->end(); ?>
 		</div>
@@ -111,7 +111,7 @@
 					</li>
 				</ul>
 				<div class="button_row">
-					<a class="btn_right submit cpExtendedSubmit" href="#"><?php $this->_('Cpe.button.generate'); ?></a>
+					<a class="<?php if(explode(".", BLESTA_VERSION)[0] == 4){ ?>btn btn-default pull-right btn-sm<?php } else { ?>btn_right<?php } ?> submit cpExtendedSubmit" href="#"><?php $this->_('Cpe.button.generate'); ?></a>
 				</div>
 			<?php $this->Form->end(); ?>
 		</div>
@@ -200,7 +200,7 @@
 					</li>
 				</ul>
 				<div class="button_row">
-					<a class="btn_right submit cpExtendedSubmit" href="#"><?php $this->_('Cpe.button.generate'); ?></a>
+					<a class="<?php if(explode(".", BLESTA_VERSION)[0] == 4){ ?>btn btn-default pull-right btn-sm<?php } else { ?>btn_right<?php } ?> submit cpExtendedSubmit" href="#"><?php $this->_('Cpe.button.generate'); ?></a>
 				</div>
 			<?php $this->Form->end(); ?>
 		</div>
@@ -255,7 +255,7 @@
 					</div>
 				</ul>
 				<div class="button_row">
-					<a class="btn_right submit cpExtendedSubmit" href="#"><?php $this->_('Cpe.button.upload'); ?></a>
+					<a class="<?php if(explode(".", BLESTA_VERSION)[0] == 4){ ?>btn btn-default pull-right btn-sm<?php } else { ?>btn_right<?php } ?> submit cpExtendedSubmit" href="#"><?php $this->_('Cpe.button.upload'); ?></a>
 				</div>
 			<?php $this->Form->end(); ?>
 		</div>
@@ -313,7 +313,7 @@
 					</li>
 				</ul>
 				<div class="button_row">
-					<a class="btn_right submit cpExtendedSubmit" href="#"><?php $this->_('Cpe.button.generate'); ?></a>
+					<a class="<?php if(explode(".", BLESTA_VERSION)[0] == 4){ ?>btn btn-default pull-right btn-sm<?php } else { ?>btn_right<?php } ?> submit cpExtendedSubmit" href="#"><?php $this->_('Cpe.button.generate'); ?></a>
 				</div>
 			<?php $this->Form->end(); ?>
 		</div>

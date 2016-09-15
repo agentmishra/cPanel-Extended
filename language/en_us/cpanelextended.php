@@ -279,6 +279,7 @@ $lang['Cpe.label.usernamefield'] = "Username Field";
 $lang['Cpe.label.passwordfield'] = "Password Field";
 $lang['Cpe.label.diskreseller'] = "Disk Space Reseller Limit";
 $lang['Cpe.label.bandreseller'] = "Bandwidth Reseller Limit";
+$lang['Cpe.label.suspension_reason_non_payment'] = "Non-Payment.";
 
 // Tooltip
 $lang['Cpe.tooltip.quota'] = "Provide a quota in megabytes, 0 means unlimited";
