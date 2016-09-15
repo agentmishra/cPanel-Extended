@@ -86,7 +86,7 @@
 			</div>
 			<div class="pad">
 				<div class="links_row">
-					<a class="btn_right ns_row_add" href="#"><span><?php $this->_("Cpe.edit_row.name_server_btn");?></span></a>
+					<a class="<?php if(explode(".", BLESTA_VERSION)[0] == 4){ ?>btn btn-default pull-right btn-sm<?php } else { ?>btn_right<?php } ?> ns_row_add" href="#"><span><?php $this->_("Cpe.edit_row.name_server_btn");?></span></a>
 				</div>
 				<table class="table">
 					<thead>
@@ -140,7 +140,7 @@
 				</ul>
 			</div>
 
-			<div class="button_row"><a class="btn_right submit" href="#"><?php $this->_("Cpe.edit_row.add_btn");?></a></div>
+			<div class="button_row"><a class="<?php if(explode(".", BLESTA_VERSION)[0] == 4){ ?>btn btn-default pull-right btn-sm<?php } else { ?>btn_right<?php } ?> submit" href="#"><?php $this->_("Cpe.edit_row.add_btn");?></a></div>
 			<?php
 			$this->Form->end();
 			?>
