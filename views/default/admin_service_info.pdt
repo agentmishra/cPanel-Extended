@@ -19,7 +19,13 @@
 
 	<table class="table">
 		<tr class="heading_row">
-			<td class="fixed_small center border_none"><span class="paymnt_arrow"></span></td>
+			<td class="fixed_small center border_none">
+				<?php if(explode(".", BLESTA_VERSION)[0] == 4){ ?>
+				<i class="fa fa-level-up fa-rotate-90"></i>
+				<?php } else { ?>
+				<span class="paymnt_arrow"></span>
+				<?php } ?>
+			</td>
 			<td class="border_left"><?php $this->_("Cpe.service_info.username");?></td>
 			<td><?php $this->_("Cpe.service_info.password");?></td>
 			<td><?php $this->_("Cpe.service_info.server");?></td>
