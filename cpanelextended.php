@@ -1992,7 +1992,6 @@ class cpanelextended extends Module {
 			));
 		// Comparing Passwords
 		if(!empty($post)) {
-			$stats = new stdClass();
 			if($post['pass'] == $post['pass_confirm'] && !empty($post['pass']) && strlen($post['pass']) > 7 ) {
 				$pass_defined = trim($post['pass']);
 				$params       = array(
@@ -2025,7 +2024,6 @@ class cpanelextended extends Module {
 	 * @return string The string representing the contents of this tab
 	 */
 	public function zoneeditor($package, $service, array $get = null, array $post = null, array $files = null) {
-		global $out;
 		// Add DNS
 		if(isset($post['ttl']) && isset($post['name']) && isset($post['record']) && isset($post['type']) && !($post['type'] == 'MX')) {
 			$row            = $this->getModuleRow();
@@ -2121,7 +2119,6 @@ class cpanelextended extends Module {
 	 * @return string The string representing the contents of this tab
 	 */
 	public function emailforwarder($package, $service, array $get = null, array $post = null, array $files = null) {
-		global $out;
 		// Add Forwarder
 		if(isset($post['email']) && isset($post['fwdemail'])) {
 			$row            = $this->getModuleRow();
@@ -3420,7 +3417,7 @@ class cpanelextended extends Module {
 			$fields = $this->serviceFieldsToObject($service->fields);
 			$api    = $this->getsoftaApi($package, $service, $row->meta->host_name, $fields->cpanel_username, $fields->cpanel_password);
 			if(isset($post['submitremovebu'])) {
-				$remove_backup = $api->remove_backup($post['filename']);
+				$api->remove_backup($post['filename']);
 			} else if(isset($post['submitmakebu'])) {
 				$api->backup($post['installid']);
 			} else if(isset($post['submitrestorebu'])) {
@@ -3810,7 +3807,6 @@ class cpanelextended extends Module {
 	 * @return string The string representing the contents of this tab
 	 */
 	public function tabZoneeditor($package, $service, array $get = null, array $post = null, array $files = null) {
-		global $out;
 		//Add DNS
 		if(isset($post['ttl']) && isset($post['name']) && isset($post['record']) && isset($post['type']) && !($post['type'] == 'MX')) {
 			$row            = $this->getModuleRow();
@@ -3906,7 +3902,6 @@ class cpanelextended extends Module {
 	 * @return string The string representing the contents of this tab
 	 */
 	public function tabEmailforwarder($package, $service, array $get = null, array $post = null, array $files = null) {
-		global $out;
 		//Add Forwarder
 		if(isset($post['email']) && isset($post['fwdemail'])) {
 			$row            = $this->getModuleRow();
@@ -5091,7 +5086,7 @@ class cpanelextended extends Module {
 	 */
 	public function sso($username, $app=null, $service='cpaneld') {
 		$row        = $this->getModuleRow();
-		$api        = $this->getApiByMeta($row->meta, $fields);
+		$api        = $this->getApiByMeta($row->meta);
 		// Genereate SSO Session
 		$params = array(
 			'user' => $username,
