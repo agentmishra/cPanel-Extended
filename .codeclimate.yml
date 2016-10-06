@@ -40,4 +40,8 @@ engines:
         enabled: false
       Design/LongMethod:
         enabled: false
+      CyclomaticComplexity:
+        enabled: false
+      CleanCode/ElseExpression:
+        enabled: false
 # ... CONFIG CONTENT ...
