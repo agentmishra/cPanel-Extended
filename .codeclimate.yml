@@ -12,6 +12,8 @@ engines:
         enabled: false
       Controversial/CamelCaseParameterName:
         enabled: false
+      Controversial/CamelCaseVariableName:
+        enabled: false
       Naming/ShortVariable:
         enabled: false
       CleanCode/BooleanArgumentFlag:
@@ -19,5 +21,7 @@ engines:
       Controversial/Superglobals:
         enabled: false
       UnusedFormalParameter:
+        enabled: false
+      CleanCode/StaticAccess:
         enabled: false
 # ... CONFIG CONTENT ...
