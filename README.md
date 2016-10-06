@@ -1,4 +1,4 @@
-# cPanel Extended v5.1
+# cPanel Extended v5.1.1
 
 <b>New!</b> Now with Quick Actions, Dashboard, Details Section, Block IP, Backups, New Softaculous and Remote MySQL.
 
