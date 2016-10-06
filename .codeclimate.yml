@@ -32,6 +32,12 @@ engines:
         enabled: false
       Design/ExitExpression:
         enabled: false
+      Design/WeightedMethodCount:
+        enabled: false
       UnusedLocalVariable:
+        enabled: false
+      Design/NpathComplexity:
+        enabled: false
+      Design/LongMethod:
         enabled: false
 # ... CONFIG CONTENT ...
