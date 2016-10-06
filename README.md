@@ -29,4 +29,4 @@ There are many reasons to invest in this gorgeous module and we presented you on
 <li><b>Works with Blesta 4.0</b></li>
 </ul>
 <b>Note:</b> Remember, Rename the folder to "cpanelextended" before to upload.<br><br>
-<b>Security Audition:</b> https://codeclimate.com/github/CyanDarkInc/cPanel-Extended/cpanelextended.php
+<b>Security Audition:</b> https://codeclimate.com/github/CyanDarkInc/cPanel-Extended/issues
