@@ -13,7 +13,7 @@ class cpanelextended extends Module {
 	/**
 	 * @var string The version of this module
 	 */
-	private static $version = "5.1";
+	private static $version = "5.1.1";
 	/**
 	 * @var string The authors of this module
 	 */
@@ -362,22 +362,6 @@ class cpanelextended extends Module {
 			}
 		}
 		return 0;
-	}
-	/**
-	 * Debug whatever the **** you want...
-	 *
-	 * return string
-	 */
-	public function debug() {
-		if(func_num_args() === 0)
-			return;
-		// Get all passed variables
-		$variables = func_get_args();
-		$output    = array();
-		foreach($variables as $var) {
-			$output[] = print_r($var, true);
-		}
-		return '<pre class="debug">' . implode("\n", $output) . '</pre>';
 	}
 	/**
 	 * Initializes the cPanel API, checks an connection and return an cPanelAPI Instance
@@ -3479,40 +3463,38 @@ class cpanelextended extends Module {
 		$api        = $this->getApiByMeta($row->meta, $fields);
 		$this->vars = $this->getPageVars($vars);
 		//Delete webdisk
-		if(isset($_GET['delete'])) {
+		if(isset($post['delete'])) {
 			$params = array(
-				'login' => base64_decode($_GET['delete'])
+				'login' => $post['delete']
 			);
 			$this->log($row->meta->host_name . "|sendApi2Request", serialize($params), "input", true);
-			$response_del = print_r($api->sendApi2Request("WebDisk", "delwebdisk", $params), true);
+			$response = $api->sendApi2Request("WebDisk", "delwebdisk", $params)->getResponse()->cpanelresult;
+			if(isset($response->error)){
+				$this->Input->setErrors($response->error);
+			}
 		}
 		//Add webdisk
-		if(!empty($_POST['domain']) && !empty($_POST['user']) && !empty($_POST['password']) && !empty($_POST['perms'])) {
+		if(!empty($post['domain']) && !empty($post['user']) && !empty($post['password']) && !empty($post['perms'])) {
 			$params = array(
-				'domain' => $_POST['domain'],
-				'user' => $_POST['user'],
-				'password' => $_POST['password'],
-				'homedir' => 'public_html/' . $_POST['homedir'],
-				'perms' => $_POST['perms']
+				'domain' => $post['domain'],
+				'user' => $post['user'],
+				'password' => $post['password'],
+				'homedir' => 'public_html/' . $post['homedir'],
+				'perms' => $post['perms']
 			);
 			$this->log($row->meta->host_name . "|sendApi2Request", serialize($params), "input", true);
-			$response_add = print_r($api->sendApi2Request("WebDisk", "addwebdisk", $params), true);
+			$response = $api->sendApi2Request("WebDisk", "addwebdisk", $params)->getResponse()->cpanelresult;
+			if(isset($response->error)){
+				$this->Input->setErrors($response->error);
+			}
 		}
 		//Get the WebDisk's
 		$this->log($row->meta->host_name . "|sendApi2Request", "input", true);
-		$response = $api->sendApi2Request("WebDisk", "listwebdisks");
-		$response = print_r($response, true);
-		$response = substr($response, (strpos($response, "[response:protected] =>") + 23), strlen($response));
-		$response = substr($response, 0, strpos($response, "[statusmsg:protected]"));
-		$response = json_decode($response, true);
+		$accounts = $api->sendApi2Request("WebDisk", "listwebdisks")->getResponse()->cpanelresult->data;
 		$this->prepareView("webdisk");
-		$this->view->set("res", $res);
-		$this->view->set("response", $response);
-		$this->view->set("response_del", $response_del);
-		$this->view->set("response_add", $response_add);
-		$this->view->set("resp", $resp);
 		$this->view->set("row", $row);
 		$this->view->set("fields", $fields);
+		$this->view->set("accounts", $accounts);
 		$this->view->server    = $row;
 		$this->view->fields    = $fields;
 		$this->view->cpanelurl = $api->buildUrl();
@@ -4826,40 +4808,38 @@ class cpanelextended extends Module {
 		$api        = $this->getApiByMeta($row->meta, $fields);
 		$this->vars = $this->getPageVars($vars);
 		//Delete webdisk
-		if(isset($_GET['delete'])) {
+		if(isset($post['delete'])) {
 			$params = array(
-				'login' => base64_decode($_GET['delete'])
+				'login' => $post['delete']
 			);
 			$this->log($row->meta->host_name . "|sendApi2Request", serialize($params), "input", true);
-			$response_del = print_r($api->sendApi2Request("WebDisk", "delwebdisk", $params), true);
+			$response = $api->sendApi2Request("WebDisk", "delwebdisk", $params)->getResponse()->cpanelresult;
+			if(isset($response->error)){
+				$this->Input->setErrors($response->error);
+			}
 		}
 		//Add webdisk
-		if(!empty($_POST['domain']) && !empty($_POST['user']) && !empty($_POST['password']) && !empty($_POST['perms'])) {
+		if(!empty($post['domain']) && !empty($post['user']) && !empty($post['password']) && !empty($post['perms'])) {
 			$params = array(
-				'domain' => $_POST['domain'],
-				'user' => $_POST['user'],
-				'password' => $_POST['password'],
-				'homedir' => 'public_html/' . $_POST['homedir'],
-				'perms' => $_POST['perms']
+				'domain' => $post['domain'],
+				'user' => $post['user'],
+				'password' => $post['password'],
+				'homedir' => 'public_html/' . $post['homedir'],
+				'perms' => $post['perms']
 			);
 			$this->log($row->meta->host_name . "|sendApi2Request", serialize($params), "input", true);
-			$response_add = print_r($api->sendApi2Request("WebDisk", "addwebdisk", $params), true);
+			$response = $api->sendApi2Request("WebDisk", "addwebdisk", $params)->getResponse()->cpanelresult;
+			if(isset($response->error)){
+				$this->Input->setErrors($response->error);
+			}
 		}
 		//Get the WebDisk's
 		$this->log($row->meta->host_name . "|sendApi2Request", "input", true);
-		$response = $api->sendApi2Request("WebDisk", "listwebdisks");
-		$response = print_r($response, true);
-		$response = substr($response, (strpos($response, "[response:protected] =>") + 23), strlen($response));
-		$response = substr($response, 0, strpos($response, "[statusmsg:protected]"));
-		$response = json_decode($response, true);
+		$accounts = $api->sendApi2Request("WebDisk", "listwebdisks")->getResponse()->cpanelresult->data;
 		$this->prepareView("admin_webdisk");
-		$this->view->set("res", $res);
-		$this->view->set("response", $response);
-		$this->view->set("response_del", $response_del);
-		$this->view->set("response_add", $response_add);
-		$this->view->set("resp", $resp);
 		$this->view->set("row", $row);
 		$this->view->set("fields", $fields);
+		$this->view->set("accounts", $accounts);
 		$this->view->server    = $row;
 		$this->view->fields    = $fields;
 		$this->view->cpanelurl = $api->buildUrl();
@@ -5119,7 +5099,7 @@ class cpanelextended extends Module {
 			'service' => $service,
             'app' => $app
 		);
-		$result = $api->create_user_session($params, 1);
+		$result = $api->createUserSession($params, 1);
 		$result = $this->parseResponse($result->getCleanResponse());
         return $result->data->url;
     }

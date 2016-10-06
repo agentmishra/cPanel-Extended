@@ -49,8 +49,8 @@
 				?>
 			</li>
 			<li>
-				<?php $this->Form->label($this->_('Cpe.webdisk.perms', true), 'perms'); ?>
-				<select name="perms">
+				<?php $this->Form->label($this->_('Cpe.label.privileges', true), 'perms'); ?>
+				<select name="perms" class="form-control">
 				  	<option value="rw">Read-Write</option>
 				  	<option value="ro">Read</option>
 				</select>
@@ -63,38 +63,34 @@
 </div>
 
 <div class="title_row">
-	<h3><?php $this->_('Cpe.manage.module_rows_heading.accounts'); ?></h3>
+	<h3><?php $this->_('Cpe.webdisk.accounts'); ?></h3>
 </div>
-<div class="pad">
-	<?php if(isset($_GET['delete'])){ ?>
-		<?php if(preg_match("/success/i", $response_del)){ ?>
-			<strong style="color: #008000;"><?php $this->_('Cpe.misc.success'); ?></strong>
-		<?php } else { ?>
-			<strong style="color: #800000;"><?php $this->_('Cpe.!error.api.internal'); ?></strong>
-		<?php } ?>
-	<?php } ?>
-	
+<div class="pad">	
 	<table class="table">
 		<thead>
 			<tr class="heading_row">
-            	<td><?php $this->_('Cpe.th.username'); ?></td>
-            	<td><?php $this->_('Cpe.th.domain'); ?></td>
-            	<td><?php $this->_('Cpe.label.port'); ?></td>
-            	<td><?php $this->_('Cpe.th.path'); ?></td>
-            	<td><?php $this->_('Cpe.webdisk.perms'); ?></td>
-            	<td><?php $this->_('Cpe.th.options'); ?></td>
+                <td><?php $this->_('Cpe.label.username'); ?></td>
+                <td><?php $this->_('Cpe.label.domain'); ?></td>
+                <td><?php $this->_('Cpe.label.port'); ?></td>
+                <td><?php $this->_('Cpe.label.directory'); ?></td>
+                <td><?php $this->_('Cpe.label.privileges'); ?></td>
+                <td><?php $this->_('Cpe.th.actions'); ?></td>
 			</tr>
 		</thead>
 		<tbody>
 		<?php $i = 1; ?>
-		<?php foreach($response['cpanelresult']['data'] as $account){ ?>
+		<?php foreach($accounts as $account){ ?>
 			<tr <?php if($i % 2 == 0){ ?>class="odd_row"<?php } ?>>
-                <td><?= $account['user']; ?></td>
-                <td><?= $account['domain']; ?></td>
-                <td><?= $account['mainport']; ?></td>
-                <td><?= $account['homedir']; ?></td>
-                <td><?= $account['perms']; ?></td>
-                <td><a href="?delete=<?= base64_encode($account['user'].'@'.$account['domain']); ?>"><?php $this->_('Cpe.add_row.remove_name_server'); ?></a></td>
+                <td><?php $this->Html->_($account->user); ?></td>
+        		<td><?php $this->Html->_($account->domain); ?></td>
+                <td><?php $this->Html->_($account->mainport); ?></td>
+                <td><?php $this->Html->_($account->homedir); ?></td>
+                <td><?php $this->Html->_($account->perms); ?></td>
+                <td>
+					<?php $this->Form->create($this->uri.'create'); ?>
+					<button type="submit" name="delete" value="<?php $this->Html->_($account->login); ?>" <?php if(explode(".", BLESTA_VERSION)[0] == 4){ ?>class="btn btn-sm btn-danger"<?php } ?>><i class="fa fa-ban"></i> <?php $this->_('Cpe.webdisk.delete'); ?></button>
+					<?php $this->Form->end(); ?>
+				</td>
 			</tr>
 			<?php $i++; ?>
 		<?php } ?>

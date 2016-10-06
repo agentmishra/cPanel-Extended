@@ -18,37 +18,8 @@
 
 echo $this->commonHeader;
 ?>
-<style>.alert-danger{ display: none; }</style>
-		<?php
-
-		if(isset($_GET['delete'])){
-			if(preg_match("/success/i", $response_del)){
-				echo'
-					<div class="alert alert-success alert-dismissable" style="margin-bottom: 15px;">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-						<p>'.Language::_("Cpe.misc.success", true).'</p>
-					</div>';
-			} else {
-				echo'
-					<div class="alert alert-warning alert-dismissable" style="margin-bottom: 15px;">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-						<p>'.Language::_("Cpe.!error.api.internal", true).'</p>
-					</div>';
-			}
-		}
-		if(!empty($_POST['domain']) && !empty($_POST['user']) && !empty($_POST['password']) && !empty($_POST['perms'])){
-			if(!preg_match("/success/i", $response_add)){
-				echo'
-					<div class="alert alert-warning alert-dismissable" style="margin-bottom: 15px;">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-						<p>'.Language::_("Cpe.!error.api.internal", true).'</p>
-					</div>';
-			}
-		}
-		?>
-
 	<h4><?php $this->_('Cpe.webdisk'); ?></h4>
-	<p><?php $this->_('Cpe.description.webdisk'); ?></p>
+	<p><?php $this->_('Cpe.webdisk.description'); ?></p>
 
 	<hr />
 	<h4><?php $this->_('Cpe.webdisk.add'); ?></h4>
@@ -83,7 +54,7 @@ echo $this->commonHeader;
 				?>
 			</div>
 			<div class="form-group">
-				<?php $this->Form->label($this->_('Cpe.webdisk.perms', true), 'perms'); ?>
+				<?php $this->Form->label($this->_('Cpe.label.privileges', true), 'perms'); ?>
 				<select name="perms" class="form-control">
 				  	<option value="rw">Read-Write</option>
 				  	<option value="ro">Read</option>
@@ -100,29 +71,33 @@ echo $this->commonHeader;
 	</div>
 
 	<hr />
-	<h4>WebDisk Accounts</h4>
+	<h4><?php $this->_('Cpe.webdisk.accounts'); ?></h4>
 	<div class="table-responsive">
         <table class="table table-curved table-striped-alt">
             <thead>
                 <tr>
-                    <th>User</th>
-                    <th>Domain</th>
-                    <th>Port</th>
-                    <th>Directory</th>
-                    <th>Perms</th>
-                    <th></th>
+                    <th><?php $this->_('Cpe.label.username'); ?></th>
+                    <th><?php $this->_('Cpe.label.domain'); ?></th>
+                    <th><?php $this->_('Cpe.label.port'); ?></th>
+                    <th><?php $this->_('Cpe.label.directory'); ?></th>
+                    <th><?php $this->_('Cpe.label.privileges'); ?></th>
+                    <th><?php $this->_('Cpe.th.actions'); ?></th>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach($response['cpanelresult']['data'] as $account){ ?>
+                <?php foreach($accounts as $account){ ?>
                 	<tr>
-                		<td><?= $account['user']; ?></td>
-                		<td><?= $account['domain']; ?></td>
-                		<td><?= $account['mainport']; ?></td>
-                		<td><?= $account['homedir']; ?></td>
-                		<td><?= $account['perms']; ?></td>
-                		<td><a href="?delete=<?= base64_encode($account['user'].'@'.$account['domain']); ?>"><button type="submit" class="btn btn-danger"><i class="fa fa-ban"></i> <?php $this->_('Cpe.add_row.remove_name_server'); ?></button></a></td>
-                	</tr>
+                		<td><?php $this->Html->_($account->user); ?></td>
+                		<td><?php $this->Html->_($account->domain); ?></td>
+                		<td><?php $this->Html->_($account->mainport); ?></td>
+                		<td><?php $this->Html->_($account->homedir); ?></td>
+                		<td><?php $this->Html->_($account->perms); ?></td>
+                		<td>
+							<?php $this->Form->create($this->uri.'create'); ?>
+							<button type="submit" name="delete" value="<?php $this->Html->_($account->login); ?>" class="btn btn-sm btn-danger"><i class="fa fa-ban"></i> <?php $this->_('Cpe.webdisk.delete'); ?></button>
+							<?php $this->Form->end(); ?>
+						</td>
+					</tr>
                 <?php } ?>
             </tbody>
         </table>

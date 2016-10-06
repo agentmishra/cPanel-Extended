@@ -119,19 +119,6 @@ class cPanelApi {
 		return $this->sendRequest('json-api/createacct', $params);
 	}
 	/**
-	 * Create an user session
-	 *
-	 * @param array $params
-	 */
-	public function create_user_session($params, $version = 0) {
-		if($version == 1) {
-			$params = array_merge(array(
-				'api.version' => 1
-			), $params);
-		}
-		return $this->sendRequest('json-api/create_user_session', $params);
-	}
-	/**
 	 * Suspend an user account
 	 *
 	 * @param array $params
@@ -187,9 +174,21 @@ class cPanelApi {
 		$response = $this->getCleanResponse();
 		if(is_string($response)) {
 			return $response;
-		} else {
-			return '';
 		}
+		return '';
+	}
+	/**
+	 * Create an user session
+	 *
+	 * @param array $params
+	 */
+	public function createUserSession($params, $version = 0) {
+		if($version == 1) {
+			$params = array_merge(array(
+				'api.version' => 1
+			), $params);
+		}
+		return $this->sendRequest('json-api/create_user_session', $params);
 	}
 	/**
 	 * Method wich creating a correct URL for requests from params
@@ -255,8 +254,9 @@ class cPanelApi {
 	 * @return \cPanelApi
 	 */
 	public function sendApi1Request($module, $action, $data = array()) {
-		$args     = array();
-		$argcount = 0;
+		$args     	= array();
+		$argcount 	= 0;
+		$key 		= null;
 		foreach($data as $key => $value) {
 			$args['arg-' . $argcount] = $value;
 			$argcount++;
@@ -290,9 +290,6 @@ class cPanelApi {
 			return false;
 		} elseif(isset($result->cpanelresult->data[0]->status) && $result->cpanelresult->data[0]->status === 0) {
 			$this->statusmsg = (isset($result->cpanelresult->data[0]->statusmsg) ? $result->cpanelresult->data[0]->statusmsg : $result->cpanelresult->error);
-			return false;
-		} elseif(isset($result->cpanelresult) && !empty($result->cpanelresult->error)) {
-			$this->statusmsg = (isset($result->cpanelresult->data->reason) ? $result->cpanelresult->data->reason : $result->cpanelresult->error);
 			return false;
 		}
 		$this->statusmsg = 'success';
