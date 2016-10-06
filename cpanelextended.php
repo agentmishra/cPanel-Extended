@@ -450,7 +450,7 @@ class cpanelextended extends Module {
 						'bandwidth_limit' => $package->meta->bandreseller
 					);
 					$this->log($row->meta->host_name . "|setresellerlimits", serialize($params_api), "input", true);
-					$response = $xmlapi->setresellerlimits($params_api);
+					$xmlapi->setresellerlimits($params_api);
 				}
 			}
 			// Update the number of accounts on the server
