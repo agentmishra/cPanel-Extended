@@ -568,7 +568,7 @@ class cpanelextended extends Module {
 						'bandwidth_limit' => $package->meta->bandreseller
 					);
 					$this->log($row->meta->host_name . "|setresellerlimits", serialize($params), "input", true);
-					$response = $xmlapi->setresellerlimits($params);
+					$xmlapi->setresellerlimits($params);
 				}
 			}
 		}
@@ -1130,7 +1130,6 @@ class cpanelextended extends Module {
 		);
 		if($row) {
 			$pkglist  = $api->listpkgs()->getResponse();
-			$aclslist = $api->listacls()->getResponse();
 			//Generate a list with all ACLS
 			$keys     = (array) $this->Json->decode($api->listacls())->acls;
 			$acls     = array(
@@ -3058,7 +3057,7 @@ class cpanelextended extends Module {
 			$api    = $this->getApiByMeta($row->meta, $fields);
 			if(isset($post['delete_denyip'])) {
 				if(!empty($post['ip'])) {
-					$delete_email = $api->sendApi1Request("DenyIp", "deldenyip", $post);
+					$api->sendApi1Request("DenyIp", "deldenyip", $post);
 					$this->log($row->meta->host_name . "|deldenyip", serialize("deldenyip"), "input", true);
 				} else {
 					$error = array(
@@ -3423,13 +3422,13 @@ class cpanelextended extends Module {
 			if(isset($post['submitremovebu'])) {
 				$remove_backup = $api->remove_backup($post['filename']);
 			} else if(isset($post['submitmakebu'])) {
-				$make_backup = $api->backup($post['installid']);
+				$api->backup($post['installid']);
 			} else if(isset($post['submitrestorebu'])) {
-				$restore = $api->restore($post['filename']);
+				$api->restore($post['filename']);
 			} else if(isset($post['submitdeleteinstall'])) {
-				$remove = $api->remove($post['installid']);
+				$api->remove($post['installid']);
 			} else if(isset($post['submitupgrade'])) {
-				$upgrade = $api->upgrade($post['installid']);
+				$api->upgrade($post['installid']);
 			}
 			$getallscripts  = $api->list_scripts();
 			$result_backups = $api->list_backups();
@@ -3440,6 +3439,8 @@ class cpanelextended extends Module {
 			$this->view->set("user_type", $package->meta->type);
 			$this->view->set("module_row", $row);
 			$this->view->set("service_fields", $fields);
+			$this->view->set("getallscripts", $getallscripts);
+			$this->view->set("result_backups", $result_backups);
 			$this->view->set("installations", $installations);
 			$this->view->set("listscripts", $api->scripts);
 			$this->view->set("cpdomain", $fields->domain_name);
@@ -3673,7 +3674,6 @@ class cpanelextended extends Module {
 	public function loginto($package, $service, array $vars = array(), array $post = array()) {
 		$row        = $this->getModuleRow();
 		$fields     = $this->serviceFieldsToObject($service->fields);
-		$api        = $this->getApiByMeta($row->meta, $fields);
 		$this->vars = $this->getPageVars($vars);
 		// Array with SSO links
 		$sso = array(
@@ -3778,7 +3778,6 @@ class cpanelextended extends Module {
 			));
 		//Comparing Passwords
 		if(!empty($post)) {
-			$stats = new stdClass();
 			if($post['pass'] == $post['pass_confirm']) {
 				$pass_defined = trim($post['pass']);
 				$params       = array(
@@ -4975,7 +4974,7 @@ class cpanelextended extends Module {
 	 *
 	 * @return object Softaculous API
 	 */
-	private function getsoftaApi($package, $service = NULL, $host, $user, $pass, $apitype = NULL) {
+	public function getsoftaApi($package, $service = NULL, $host, $user, $pass, $apitype = NULL) {
 		Loader::load(dirname(__FILE__) . DS . "api" . DS . "softaculous_api.php");
 		$api   = new Softaculous_API();
 		$stats = $this->getStats($package, $service);
@@ -4991,7 +4990,7 @@ class cpanelextended extends Module {
 	 *
 	 * @return array Available Domains
 	 */
-	private function getAvailableDomains($package, $service) {
+	public function getAvailableDomains($package, $service) {
 		$row           = $this->getModuleRow();
 		$fields        = $this->serviceFieldsToObject($service->fields);
 		$api           = $this->getApiByMeta($row->meta, $fields);
@@ -5007,7 +5006,7 @@ class cpanelextended extends Module {
 	 *
 	 * @return array Available Domains
 	 */
-	private function scriptsavailable($package, $service) {
+	public function scriptsavailable($package, $service) {
 		$row            = $this->getModuleRow($package->module_row);
 		$service_fields = $this->serviceFieldsToObject($service->fields);
 		$api            = $this->getsoftaApi($package, $service, $row->meta->hostname, $service_fields->username, $service_fields->password);
@@ -5025,7 +5024,7 @@ class cpanelextended extends Module {
 	 * @param string $str A string
 	 * @return boolean True if $str is a URL, false otherwise
 	 */
-	private function isUrl($str) {
+	public function isUrl($str) {
 		return preg_match("#^\S+://\S+\.\S+.+$#", $str);
 	}
 	/**

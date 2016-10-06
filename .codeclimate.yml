@@ -6,6 +6,8 @@ engines:
     checks:
       Design/TooManyPublicMethods:
         enabled: false
+      Design/TooManyMethods:
+        enabled: false
       Controversial/CamelCaseClassName:
         enabled: false
       Controversial/CamelCaseMethodName:
@@ -23,5 +25,9 @@ engines:
       UnusedFormalParameter:
         enabled: false
       CleanCode/StaticAccess:
+        enabled: false
+      ExcessivePublicCount:
+        enabled: false
+      Design/LongClass:
         enabled: false
 # ... CONFIG CONTENT ...
