@@ -16,6 +16,8 @@ engines:
         enabled: false
       Controversial/CamelCaseVariableName:
         enabled: false
+      Controversial/CamelCasePropertyName:
+        enabled: false
       Naming/ShortVariable:
         enabled: false
       CleanCode/BooleanArgumentFlag:
