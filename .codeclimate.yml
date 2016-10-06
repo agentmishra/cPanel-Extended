@@ -2,7 +2,7 @@ engines:
   # ... CONFIG CONTENT ...
   phpmd:
     enabled: true
-    # ... SHOW ONLY FATAL ERRORS, HIDE WARNINGS ...
+    # ... SHOW ONLY SECURITY RISK, HIDE STYLE ADVICES ...
     checks:
       Design/TooManyPublicMethods:
         enabled: false
@@ -29,5 +29,9 @@ engines:
       ExcessivePublicCount:
         enabled: false
       Design/LongClass:
+        enabled: false
+      Design/ExitExpression:
+        enabled: false
+      UnusedLocalVariable:
         enabled: false
 # ... CONFIG CONTENT ...
